@@ -17,7 +17,7 @@ public class Lexer {
 	private static char currentChar; // 当前字符
 	private static int lineNo; // 行号
 
-	public static LinkedList<Token> lexicalAnalyse(BufferedReader br) throws IOException {
+	public static LinkedList<Token> lexicalAnalyse(BufferedReader br) throws IOException, LexerException {
 		lineNo = 1;
 		mBufferedReader = br;
 		LinkedList<Token> tokenList = new LinkedList<Token>();
@@ -264,12 +264,12 @@ public class Lexer {
 						token.setType(TokenType.ID);
 						token.setValue(sbString);
 					} else {
-						try {
-							throw new LexerException(
-									"第" + token.getLineNo() + "行     " + "Invalid Identifier" + ":  " +sbString);
-						} catch (LexerException e) {
-							e.printStackTrace();
-						}
+//							try{
+//							throw new LexerException(
+//									"第" + token.getLineNo() + "行     " + "Invalid Identifier" + ":  " +sbString);
+//							}catch(LexerException e1){
+//								e1.printStackTrace();
+//							}
 					}
 				}
 				sb.delete(0, sb.length());

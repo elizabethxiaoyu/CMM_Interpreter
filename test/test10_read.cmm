@@ -1,0 +1,4 @@
+﻿//read赋值
+double r;
+read(r);
+write(r);

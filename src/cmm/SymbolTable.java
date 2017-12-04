@@ -52,7 +52,7 @@ public class SymbolTable {
 	 * @param symbol
 	 * @throws InterpretException
 	 */
-	public void register(Symbol symbol) throws InterpretException {
+	public void register(Symbol symbol, int lineNo) throws InterpretException {
 		int i = 0;
 		while(i < symbolList.size()){
 			if (symbolList.get(i).getName() == null) {
@@ -66,7 +66,7 @@ public class SymbolTable {
 						symbolList.set(i, symbol);
 						return;
 					} else {
-						throw new InterpretException("变量 <" + symbol.getName() + "> 重复声明");
+						throw new InterpretException("line " + lineNo +"  变量 <" + symbol.getName() + "> 重复声明");
 					}
 				}
 				i++;

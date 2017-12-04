@@ -1,5 +1,8 @@
 package ui;
 
+import java.awt.Color;
+import java.awt.Label;
+import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,7 +27,6 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
@@ -111,6 +113,7 @@ public class Main {
 				FileDialog fd = new FileDialog(shell, SWT.OPEN);
 				fd.setText("打开");
 				fd.setFilterExtensions(filterExt);
+				resultdata2.setText("");
 				filestr = fd.open();
 				if (filestr != null) {
 					try {
@@ -152,6 +155,7 @@ public class Main {
 					display.asyncExec(new Runnable() {
 						public void run() {
 							resultdata2.setText("Result:"+"\n");
+						
 							try {
 								LinkedList<Token> l = SyntaxParser.getTokenList(filestr);
 								LinkedList<TreeNode> tree = SyntaxParser.syntaxAnalyse(l);
@@ -195,7 +199,7 @@ public class Main {
 						resultdata2.append(token.toStringWithLine());
 						resultdata2.append(System.getProperty("line.separator"));
 					}
-				} catch (IOException e1) {
+				} catch (IOException | LexerException e1) {
 					resultdata2.setText(e1.toString());
 					// e1.printStackTrace();
 				}
@@ -213,8 +217,21 @@ public class Main {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Display_Tree.fileName = filestr;
-				Display_Tree dt= new Display_Tree();
-				dt.setVisible(true);
+				Display_Tree dt;
+				try {
+					dt = new Display_Tree();
+					dt.setVisible(true);
+				} catch (IOException e1) {
+					resultdata2.append(e1.getMessage());
+					//e1.printStackTrace();
+				} catch (LexerException e1) {
+					resultdata2.append(e1.getMessage());
+					//e1.printStackTrace();
+				} catch (ParserException e1) {
+					resultdata2.append(e1.getMessage());
+					//e1.printStackTrace();
+				}
+				
 			}
 
 
@@ -285,6 +302,7 @@ public class Main {
 		fd.bottom = new FormAttachment(50, -1);
 		fd.right = new FormAttachment(100, -1);
 		codedata.setLayoutData(fd);
+		codedata.setAlwaysShowScrollBars(false);
 		codedata.addModifyListener(new ModifyListener() {
 
 			@Override
@@ -293,14 +311,15 @@ public class Main {
 			}
 		});
 		codedata.addLineStyleListener(lineStyler);
-
+		
 		fd = new FormData();
 		fd.top = new FormAttachment(50, 24);
 		fd.left = new FormAttachment(0, 1);
 		fd.bottom = new FormAttachment(100, -1);
 		fd.right = new FormAttachment(100, -1);
 		resultdata2.setLayoutData(fd);
-		resultdata2.setEditable(false);
+		resultdata2.setEditable(true);
+		resultdata2.setAlwaysShowScrollBars(false);
 		resultdata2.setBackgroundImage(new Image(display,"res//background.png"));
 		// 主要布局结束
 

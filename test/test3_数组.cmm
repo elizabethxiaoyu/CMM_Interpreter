@@ -9,7 +9,7 @@ doubleArray[1] = a;
 doubleArray[2] = intArray[0];
 a = 0.9;
 doubleArray[3] = a;
-doubleArray[4] = 5 - 2 / (4.0 - 3) * 2.5 + 0.01; 
+doubleArray[4] = 5 - 2.5 * 2 / (4.0 - 3) + 0.01; 
 
 
 read(doubleArray[5]);

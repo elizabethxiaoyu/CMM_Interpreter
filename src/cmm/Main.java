@@ -18,17 +18,14 @@ public class Main {
 	 * @throws LexerException
 	 */
 
-	public static void main(String[] args) throws IOException, ParserException, InterpretException {
+	public static void main(String[] args) throws IOException,
+	
+	ParserException, InterpretException {
 
 		try {
 			LinkedList<Token> l = SyntaxParser.getTokenList(args[0]);
 			LinkedList<TreeNode> tree = SyntaxParser.syntaxAnalyse(l);
 
-//			System.out.println("前序遍历语法树结点为：");
-//			Iterator<TreeNode> iterator = tree.iterator();
-//			while (iterator.hasNext()) {
-//				SyntaxParser.preOrderTraverse(iterator.next());
-//			}
 			Interpreter.interpreter(tree);
 			
 		} catch (LexerException e) {

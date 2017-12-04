@@ -9,12 +9,11 @@ public class TreeNode {
 	private boolean mBoolean;
 	//表达式的符号 （+ - 默认是+）
 	private TokenType mDataType;
-	
+	private int lineNo;
 	//存储字符串形式的值（变量名）
 	private String value;
 	private double mData;
 	
-	//TODO 代码块
 	 // 如果是代码块中的代码,则mNext指向其后面的一条语句 普通的顶级代码都是存在linkedlist中,不需要使用这个参数
 	private TreeNode mNext;
 	
@@ -32,10 +31,11 @@ public class TreeNode {
 			break;
 		}
 	}
-	public TreeNode(TreeNodeType type,String value) {
+	public TreeNode(TreeNodeType type,String value,int lineNo) {
 		super();
 		this.type = type;
 		this.value = value;
+		this.lineNo = lineNo;
 		switch (this.type) {
 		case FACTOR:
 		case LITREAL:
@@ -114,6 +114,12 @@ public class TreeNode {
 		this.value = value;
 	}
 
+	public int getLineNo() {
+		return lineNo;
+	}
+	public void setLineNo(int lineNo) {
+		this.lineNo = lineNo;
+	}
 	@Override
 	public String toString() {
 		if(this.mDataType == TokenType.MINUS)

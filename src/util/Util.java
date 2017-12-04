@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Text;
 
 import cmm.Lexer;
 import cmm.SyntaxParser;
+import exception.LexerException;
 import exception.ParserException;
 import model.Token;
 import model.TreeNode;
@@ -95,8 +96,9 @@ private static void printException(Text text, Exception e){
 	 * @param filestr
 	 * @return
 	 * @throws IOException
+	 * @throws LexerException 
 	 */
-	public static LinkedList<Token> getTokenList(String filestr) throws IOException {
+	public static LinkedList<Token> getTokenList(String filestr) throws IOException, LexerException {
 		FileReader fr;
 		fr = new FileReader(filestr);
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filestr), "UTF-8"));
