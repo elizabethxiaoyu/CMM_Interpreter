@@ -1,4 +1,5 @@
-int a =9;
-if(a != 0){
-	write(7777);
+int i = 0 ;
+if(i == 0){
+	read(i);
 }
+write(i);

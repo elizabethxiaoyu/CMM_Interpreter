@@ -10,6 +10,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.LinkedList;
+
+import javax.swing.JFrame;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
@@ -247,7 +250,7 @@ public class Main {
 							Interpreter.result.setLength(0);
 						}
 					});
-					//在完成语法分析后在此加可执行文件
+		
 					
 				} catch (Exception e1) {
 				}
@@ -291,6 +294,7 @@ public class Main {
 			public void widgetSelected(SelectionEvent e) {
 				Display_Tree.fileName = filestr;
 				Display_Tree dt;
+	
 				try {
 					dt = new Display_Tree();
 					dt.setVisible(true);
@@ -316,12 +320,22 @@ public class Main {
 		
 		aboutItem.addSelectionListener(new SelectionListener() {
 
-			@Override
+			
 			public void widgetSelected(SelectionEvent e) {
-				StringBuilder sb = new StringBuilder();
-				sb.append("CMM解释器" + System.getProperty("line.separator") + System.getProperty("line.separator"));
-				sb.append("作者: AliceLiu" + System.getProperty("line.separator") + System.getProperty("line.separator"));
-				resultdata2.setText(sb.toString());
+				JFrame frame = new JFrame("Love CMM");
+				AboutInterface f = new AboutInterface();
+				frame.add(f);
+				f.init();
+				
+				frame.setLocationRelativeTo(null);  
+		        frame.setSize(350, 310);  
+		        frame.setVisible(true);
+		        frame.setLocationRelativeTo(null);
+		        
+//				StringBuilder sb = new StringBuilder();
+//				sb.append("CMM解释器" + System.getProperty("line.separator") + System.getProperty("line.separator"));
+//				sb.append("作者: AliceLiu" + System.getProperty("line.separator") + System.getProperty("line.separator"));
+//				resultdata2.setText(sb.toString());
 			}
 
 			@Override

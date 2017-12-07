@@ -203,7 +203,7 @@ public class Interpreter {
 			result.append(s + "\n");
 		}
 	}
-
+	
 	/**
 	 * int a; read(a); write(a);
 	 * 
