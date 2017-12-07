@@ -25,7 +25,7 @@ public class Interpreter {
 		for (TreeNode root : tree) {
 			if (root != null)
 				interpreterStmt(root);
-		}	
+		}
 	}
 
 	private static void interpreterStmt(TreeNode root) throws InterpretException {
@@ -35,6 +35,9 @@ public class Interpreter {
 			break;
 		case WHILE_STMT:
 			interpreterWHILE(root);
+			break;
+		case PRINT_STMT:
+			interpreterPRINT(root);
 			break;
 		case BREAK_STMT: // 这里还要测试
 			break;
@@ -68,13 +71,13 @@ public class Interpreter {
 	 * @param root
 	 * @throws InterpretException
 	 */
-	private static void interpreterASSIGN(TreeNode root) throws InterpretException  {
+	private static void interpreterASSIGN(TreeNode root) throws InterpretException {
 		TreeNode node = root.getLeft();
 		if (node.getLeft().getType() == TreeNodeType.ID) {
 			SymbolType type = symbolTable.getSymbolType(node.getLeft().getValue());
 			Value value = new Value();
 			interpreterExpr(root.getRight());
-			
+
 			if (type == SymbolType.SINGLE_INT) {
 				value.setType(SymbolType.SINGLE_INT);
 				value.setInt((int) root.getRight().getData());
@@ -90,27 +93,28 @@ public class Interpreter {
 			SymbolType type = symbolTable.getSymbolType(node.getLeft().getValue());
 			if (type == SymbolType.ARRAY_INT) {
 
-					int length = symbolTable.getSymbolValue(node.getLeft().getValue()).getArrayInt().length;
-					if ((int) (node.getLeft().getMiddle().getData()) < 0
-							|| (int) (node.getLeft().getMiddle().getData()) >= length) {
-						try {
-							throw new InterpretException("line "+node.getLeft().getMiddle().getLineNo() + "  The index of the array is illegal." );
-						} catch (InterpretException e) {
-								e.printStackTrace();
-						}
-					} else {
-						symbolTable.setSymbolValue(node.getLeft().getValue(), (int) (root.getRight().getData()),
-								(int) (node.getLeft().getMiddle().getData()));
+				int length = symbolTable.getSymbolValue(node.getLeft().getValue()).getArrayInt().length;
+				if ((int) (node.getLeft().getMiddle().getData()) < 0
+						|| (int) (node.getLeft().getMiddle().getData()) >= length) {
+					try {
+						throw new InterpretException("line " + node.getLeft().getMiddle().getLineNo()
+								+ "  The index of the array is illegal.");
+					} catch (InterpretException e) {
+						e.printStackTrace();
 					}
-				
+				} else {
+					symbolTable.setSymbolValue(node.getLeft().getValue(), (int) (root.getRight().getData()),
+							(int) (node.getLeft().getMiddle().getData()));
+				}
 
 			} else if (type == SymbolType.ARRAY_DOUBLE) {
 				int length = symbolTable.getSymbolValue(node.getLeft().getValue()).getArrayDouble().length;
 				if ((int) (node.getLeft().getMiddle().getData()) < 0
 						|| (int) (node.getLeft().getMiddle().getData()) >= length) {
-					
+
 					try {
-						throw new InterpretException("line "+node.getLeft().getMiddle().getLineNo() + "  The index of the array is illegal.");
+						throw new InterpretException("line " + node.getLeft().getMiddle().getLineNo()
+								+ "  The index of the array is illegal.");
 					} catch (InterpretException e) {
 						e.printStackTrace();
 					}
@@ -132,7 +136,7 @@ public class Interpreter {
 				value.setArrayInt(array);
 				value.setType(SymbolType.ARRAY_INT);
 				symbol.setValue(value);
-				symbolTable.register(symbol,root.getMiddle().getLeft().getLineNo());
+				symbolTable.register(symbol, root.getMiddle().getLeft().getLineNo());
 			} else {
 				Symbol symbol = new Symbol(root.getMiddle().getLeft().getValue(), SymbolType.SINGLE_INT, mLevel);
 				Value value = new Value();
@@ -140,14 +144,14 @@ public class Interpreter {
 				TreeNode node = root.getMiddle().getLeft().getLeft();
 				if (node != null && node.getType() == TreeNodeType.INTIA) {
 					interpreterExpr(node.getMiddle());
-						value.setInt((int) node.getMiddle().getData());
-					}
-					// 默认初始化为0
-				 else {
+					value.setInt((int) node.getMiddle().getData());
+				}
+				// 默认初始化为0
+				else {
 					value.setInt(0);
 				}
 				symbol.setValue(value);
-				symbolTable.register(symbol,root.getMiddle().getLeft().getLineNo());
+				symbolTable.register(symbol, root.getMiddle().getLeft().getLineNo());
 			}
 		} else if (root.getLeft().getLeft().getType() == TreeNodeType.DOUBLE) {
 			if (root.getLeft().getMiddle() != null) {
@@ -157,7 +161,7 @@ public class Interpreter {
 				value.setArrayDouble(array);
 				value.setType(SymbolType.ARRAY_DOUBLE);
 				symbol.setValue(value);
-				symbolTable.register(symbol,root.getMiddle().getLeft().getLineNo());
+				symbolTable.register(symbol, root.getMiddle().getLeft().getLineNo());
 			} else {
 				Symbol symbol = new Symbol(root.getMiddle().getLeft().getValue(), SymbolType.SINGLE_DOUBLE, mLevel);
 				Value value = new Value();
@@ -171,7 +175,7 @@ public class Interpreter {
 					value.setDouble(0.0);
 				}
 				symbol.setValue(value);
-				symbolTable.register(symbol,root.getMiddle().getLeft().getLineNo());
+				symbolTable.register(symbol, root.getMiddle().getLeft().getLineNo());
 
 			}
 		}
@@ -179,14 +183,25 @@ public class Interpreter {
 
 	private static void interpreterWRITE(TreeNode root) throws InterpretException {
 		String s = String.valueOf(interpreterExpr(root.getMiddle()).getData());
-		if (pattern2.matcher(s).matches() &&interpreterExpr(root.getMiddle()).getDataType() == TokenType.LITERAL_INT ) {
+		if (pattern2.matcher(s).matches() && interpreterExpr(root.getMiddle()).getDataType() == TokenType.LITERAL_INT) {
 			System.out.println(((int) Double.parseDouble(s)));
 			result.append(String.valueOf(((int) Double.parseDouble(s))) + "\n");
 		} else {
 			System.out.println(s);
 			result.append(s + "\n");
+		}
+
 	}
 
+	private static void interpreterPRINT(TreeNode root) throws InterpretException {
+		String s = String.valueOf(interpreterExpr(root.getMiddle()).getData());
+		if (pattern2.matcher(s).matches() && interpreterExpr(root.getMiddle()).getDataType() == TokenType.LITERAL_INT) {
+			System.out.print(((int) Double.parseDouble(s)));
+			result.append(String.valueOf(((int) Double.parseDouble(s))) + "\n");
+		} else {
+			System.out.print(s);
+			result.append(s + "\n");
+		}
 	}
 
 	/**
@@ -201,16 +216,18 @@ public class Interpreter {
 	 * @param root
 	 * @throws InterpretException
 	 */
-	private static void interpreterREAD(TreeNode root) throws InterpretException  {
+	private static void interpreterREAD(TreeNode root) throws InterpretException {
 
 		SymbolType type = symbolTable.getSymbolType(root.getMiddle().getLeft().getValue());
 		Value value = new Value(type);
-		Scanner sc = new Scanner(System.in);
-
+	//	Scanner sc = new Scanner(System.in);
+		String input = ui.Main.input.getText();
+		
 		switch (type) {
 		case SINGLE_INT:
 			try {
-				value.setInt(sc.nextInt());
+				//value.setInt(sc.nextInt());
+				value.setInt(Integer.parseInt(input));
 				symbolTable.setSymbolValue(root.getMiddle().getLeft().getValue(), value);
 			} catch (InputMismatchException e) {
 				try {
@@ -221,36 +238,51 @@ public class Interpreter {
 			}
 			break;
 		case SINGLE_DOUBLE:
-			value.setDouble(sc.nextDouble());
+			//value.setDouble(sc.nextDouble());
+			value.setDouble(Double.parseDouble(input));
 			symbolTable.setSymbolValue(root.getMiddle().getLeft().getValue(), value);
 			break;
 		case ARRAY_INT:
 			if (root.getMiddle().getLeft().getLeft() == null) {// 赋值整个数组
 				int[] array = symbolTable.getSymbolValue(root.getMiddle().getLeft().getValue()).getArrayInt();
-				for (int i = 0; i < array.length; i++)
-					array[i] = sc.nextInt();
+//				for (int i = 0; i < array.length; i++)
+//					array[i] = sc.nextInt();
+				String[]  result = input.split("\r\n");
+				for(int i = 0;i< array.length;i++){
+					array[i] = Integer.parseInt(result[i]);
+				}
+				
 			} else {// 赋值数组中某个元素
 				interpreterExpr(root.getMiddle().getLeft().getMiddle());
-				symbolTable.setSymbolValue(root.getMiddle().getLeft().getValue(), sc.nextInt(),
+//				symbolTable.setSymbolValue(root.getMiddle().getLeft().getValue(), sc.nextInt(),
+//						(int) root.getMiddle().getLeft().getMiddle().getData());
+				symbolTable.setSymbolValue(root.getMiddle().getLeft().getValue(), Integer.parseInt(input),
 						(int) root.getMiddle().getLeft().getMiddle().getData());
 			}
 			break;
 		case ARRAY_DOUBLE:
 			if (root.getMiddle().getLeft().getLeft() == null) {// 赋值整个数组
 				double[] array2 = symbolTable.getSymbolValue(root.getMiddle().getLeft().getValue()).getArrayDouble();
-				for (int i = 0; i < array2.length; i++)
-					array2[i] = sc.nextDouble();
+//				for (int i = 0; i < array2.length; i++)
+//					array2[i] = sc.nextDouble();
+				String[]  result = input.split("\r\n");
+				for(int i = 0;i< array2.length;i++){
+					array2[i] = Double.parseDouble(result[i]);
+				}
+				
 			} else {
 				// 赋值数组中某个元素
 				interpreterExpr(root.getMiddle().getLeft().getMiddle());
-				symbolTable.setSymbolValue(root.getMiddle().getLeft().getValue(), sc.nextDouble(),
+//				symbolTable.setSymbolValue(root.getMiddle().getLeft().getValue(), sc.nextDouble(),
+//						(int) root.getMiddle().getLeft().getMiddle().getData());
+				symbolTable.setSymbolValue(root.getMiddle().getLeft().getValue(), Double.parseDouble(input),
 						(int) root.getMiddle().getLeft().getMiddle().getData());
 			}
 			break;
 		default:
-			try{
-			throw new InterpretException("The input occurs an error.");
-			}catch(InterpretException e1){
+			try {
+				throw new InterpretException("The input occurs an error.");
+			} catch (InterpretException e1) {
 				e1.printStackTrace();
 			}
 		}
@@ -319,25 +351,24 @@ public class Interpreter {
 	}
 
 	private static TreeNode interpreterExpr(TreeNode root) throws InterpretException {
-		if (root.getLeft() == null) { //此表达式是标识符或字面值
+		if (root.getLeft() == null) { // 此表达式是标识符或字面值
 			if (root.getType() == TreeNodeType.ID) {
-				if (symbolTable.getSymbolValue(root.getValue()).getType() == SymbolType.SINGLE_INT){
+				if (symbolTable.getSymbolValue(root.getValue()).getType() == SymbolType.SINGLE_INT) {
 					root.setData(symbolTable.getSymbolValue(root.getValue()).getInt());
 					root.setDataType(TokenType.LITERAL_INT);
-				}
-				else if (symbolTable.getSymbolValue(root.getValue()).getType() == SymbolType.SINGLE_DOUBLE){
+				} else if (symbolTable.getSymbolValue(root.getValue()).getType() == SymbolType.SINGLE_DOUBLE) {
 					root.setData(symbolTable.getSymbolValue(root.getValue()).getDouble());
 					root.setDataType(TokenType.LITERAL_DOUBLE);
 				}
 				root.setBoolean(!(root.getData() == 0));
 			} else {
-				if(pattern.matcher(root.getValue()).matches())
+				if (pattern.matcher(root.getValue()).matches())
 					root.setDataType(TokenType.LITERAL_DOUBLE);
 				else
 					root.setDataType(TokenType.LITERAL_INT);
-				
+
 				root.setData(Double.parseDouble(root.getValue()));
-				
+
 				root.setBoolean(!(root.getData() == 0));
 			}
 
@@ -347,17 +378,16 @@ public class Interpreter {
 		if (root.getType() == TreeNodeType.FACTOR) {
 			if (root.getDataType() == TokenType.MINUS) {
 				root.setData(0 - (interpreterExpr(root.getLeft()).getData()));
-			root.setBoolean(!(root.getData() == 0));
+				root.setBoolean(!(root.getData() == 0));
 				return root;
 			}
 		}
 		if (root.getType() == TreeNodeType.ARRAY) {
-			if (symbolTable.getSymbolType(root.getValue()) == SymbolType.ARRAY_INT){
+			if (symbolTable.getSymbolType(root.getValue()) == SymbolType.ARRAY_INT) {
 				root.setData(symbolTable
 						.getSymbolValue(root.getValue(), (int) (interpreterExpr(root.getMiddle()).getData())).getInt());
 				root.setDataType(TokenType.LITERAL_INT);
-			}
-			else{
+			} else {
 				root.setData(
 						symbolTable.getSymbolValue(root.getValue(), (int) (interpreterExpr(root.getMiddle()).getData()))
 								.getDouble());
@@ -372,18 +402,18 @@ public class Interpreter {
 			case PLUS:
 			case MINUS:
 				TreeNode left = interpreterExpr(root.getLeft());
-				TreeNode right =  interpreterExpr(root.getRight());
-				if(left.getDataType() == TokenType.LITERAL_DOUBLE || right.getDataType() == TokenType.LITERAL_DOUBLE)
+				TreeNode right = interpreterExpr(root.getRight());
+				if (left.getDataType() == TokenType.LITERAL_DOUBLE || right.getDataType() == TokenType.LITERAL_DOUBLE)
 					root.setDataType(TokenType.LITERAL_DOUBLE);
 				else
 					root.setDataType(TokenType.LITERAL_INT);
-				root.setData(left.getData() +right.getData());
+				root.setData(left.getData() + right.getData());
 				root.setBoolean(!(root.getData() == 0));
 				break;
 			case MUL:
 				TreeNode left1 = interpreterExpr(root.getLeft());
-				TreeNode right1 =  interpreterExpr(root.getRight());
-				if(left1.getDataType() == TokenType.LITERAL_DOUBLE || right1.getDataType() == TokenType.LITERAL_DOUBLE)
+				TreeNode right1 = interpreterExpr(root.getRight());
+				if (left1.getDataType() == TokenType.LITERAL_DOUBLE || right1.getDataType() == TokenType.LITERAL_DOUBLE)
 					root.setDataType(TokenType.LITERAL_DOUBLE);
 				else
 					root.setDataType(TokenType.LITERAL_INT);
@@ -391,20 +421,21 @@ public class Interpreter {
 				root.setBoolean(!(root.getData() == 0));
 				break;
 			case DIV:
-				TreeNode left2 = 	interpreterExpr(root.getLeft());
+				TreeNode left2 = interpreterExpr(root.getLeft());
 				TreeNode right2 = interpreterExpr(root.getRight());
-				if (right2.getData() != 0){
-					if(left2.getDataType() == TokenType.LITERAL_DOUBLE || right2.getDataType() == TokenType.LITERAL_DOUBLE){
+				if (right2.getData() != 0) {
+					if (left2.getDataType() == TokenType.LITERAL_DOUBLE
+							|| right2.getDataType() == TokenType.LITERAL_DOUBLE) {
 						root.setData(left2.getData() / right2.getData());
 						root.setDataType(TokenType.LITERAL_DOUBLE);
-					}else{
-						root.setData((int)(left2.getData() / right2.getData()));
+					} else {
+						root.setData((int) (left2.getData() / right2.getData()));
 						root.setDataType(TokenType.LITERAL_INT);
 					}
 					root.setBoolean(!(root.getData() == 0));
 				} else
 					try {
-						throw new InterpretException("line "+right2.getLineNo() + "Divided by 0 !");
+						throw new InterpretException("line " + right2.getLineNo() + "Divided by 0 !");
 					} catch (InterpretException e) {
 						e.printStackTrace();
 					}

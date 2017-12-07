@@ -11,6 +11,8 @@ public enum TreeNodeType {
 	 
 	WHILE_STMT,
 	
+	PRINT_STMT,
+	
 	// left存储一个VAR
 	READ_STMT,
 	
@@ -111,7 +113,8 @@ public enum TreeNodeType {
 	 // / 
 	 DIV,
 	 
-	 TERM_EXP,
+	 TERM_EXP, 
+	 FOR_STMT,
 	
 
 

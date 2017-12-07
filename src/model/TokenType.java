@@ -29,6 +29,7 @@ public enum TokenType {
 	LCOMMENT,					//多行注释符  /*
 	RCOMMENT		,			//多行注释符 */
 	TRUE,							//true
-	FALSE							//false
-	
+	FALSE		,					//false
+	PRINT         ,                  //单行输出
+	FOR
 }

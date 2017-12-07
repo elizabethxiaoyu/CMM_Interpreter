@@ -256,6 +256,12 @@ public class Lexer {
 				} else if (sbString.equals("int")) {
 					token.setType(TokenType.INT);
 					token.setValue("int");
+				} else if(sbString.equals("print")){
+					token.setType(TokenType.PRINT);
+					token.setValue("print");
+				}else if(sbString.equals("for")){
+					token.setType(TokenType.FOR);
+					token.setValue("for");
 				} else if (sbString.equals("double")) {
 					token.setType(TokenType.DOUBLE);
 					token.setValue("double");

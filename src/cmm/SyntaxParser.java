@@ -65,6 +65,10 @@ public class SyntaxParser {
 			return parseReadStmt();
 		case WRITE:
 			return parseWriteStmt();
+		case PRINT:
+			return parsePrintStmt();
+		case FOR:
+			return parseForStmt();
 		case LBRACE:
 			return parseBlockStmt();
 		default:
@@ -79,7 +83,17 @@ public class SyntaxParser {
 		return null;
 
 	}
-
+	/**
+	 * TODO 完成for循环
+	 * @return
+	 */
+	private static TreeNode parseForStmt() {
+		consumeNextToken(TokenType.FOR);
+		TreeNode treeNode =  new TreeNode(TreeNodeType.FOR_STMT);
+		treeNode.setLineNo(currentToken.getLineNo());
+		consumeNextToken(TokenType.LPARENT);
+		return null;
+	}
 	private static TreeNode parseBreakStmt() throws ParserException {
 		consumeNextToken(TokenType.BREAK);
 		TreeNode treeNode = new TreeNode(TreeNodeType.BREAK_STMT);
@@ -131,6 +145,22 @@ public class SyntaxParser {
 		consumeNextToken(TokenType.SEMI);
 		return treeNode;
 	}
+	
+	// 分号没有加到树中去，但是进行了语法检查
+		private static TreeNode parsePrintStmt() throws ParserException {
+			//System.out.println(currentToken);
+			TreeNode treeNode = new TreeNode(TreeNodeType.PRINT_STMT);
+			consumeNextToken(TokenType.PRINT);
+			treeNode.setValue("print");
+			treeNode.setLineNo(currentToken.getLineNo());
+			consumeNextToken(TokenType.LPARENT);
+			treeNode.setLeft(new TreeNode(TreeNodeType.LPARENT, "(",currentToken.getLineNo()));
+			treeNode.setMiddle(parseExpr());
+			consumeNextToken(TokenType.RPARENT);
+			treeNode.setRight(new TreeNode(TreeNodeType.RPARENT, ")",currentToken.getLineNo()));
+			consumeNextToken(TokenType.SEMI);
+			return treeNode;
+		}
 
 	private static TreeNode parseVariable() throws ParserException {
 		consumeNextToken(TokenType.ID);

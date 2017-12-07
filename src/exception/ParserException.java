@@ -1,6 +1,14 @@
 package exception;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Text;
@@ -11,15 +19,30 @@ public class ParserException extends Exception {
 		super(msg);
 	}
 	
-	private static void printException(StyledText resultdata2, Exception e){
+	private static void printException(StyledText resultdata2, Exception e) throws IOException{
 		resultdata2.append(e.getMessage());
 		resultdata2.append("\n");
+//		FileWriter fw = new java.io.FileWriter("exception.txt", false);
+//		PrintWriter pw = new PrintWriter(fw);
+//		e.printStackTrace(pw);
+//		FileReader fr  = new FileReader("exception.txt");
+//		BufferedReader bufferedReader = new BufferedReader(fr);
+//        String lineTxt = null;
+//        while((lineTxt = bufferedReader.readLine()) != null){
+//        	resultdata2.append(lineTxt);
+//        }
 	}
 	
 	@Override
 	public void printStackTrace(PrintStream s) {
 		super.printStackTrace(s);
-		printException(ui.Main.resultdata2, this);
+		try {
+			printException(ui.Main.resultdata2, this);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 }

@@ -4,11 +4,15 @@ import java.awt.Color;
 import java.awt.Label;
 import java.awt.Point;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.LinkedList;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
@@ -45,7 +49,7 @@ public class Main {
 	final static Display display = new Display();
 	final static Shell shell = new Shell(display);
 	public static final  StyledText resultdata2  = new StyledText(shell, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.WRAP);
-	
+	public static final  StyledText input  = new StyledText(shell, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.WRAP);
 	public static void main(String[] args) {
 		final StyledText codedata = new StyledText(shell, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.WRAP);
 		final JavaLineStyler lineStyler = new JavaLineStyler();
@@ -63,7 +67,11 @@ public class Main {
 		MenuItem openItem = new MenuItem(filemenu, SWT.PUSH);
 		openItem.setText("打开(&O)\tCtrl+O");
 		openItem.setAccelerator(SWT.CTRL + 'O');
-
+		
+		MenuItem saveasItem = new MenuItem(filemenu, SWT.PUSH);
+		saveasItem.setText("保存(&A)\tCtrl+Shift+S");
+		saveasItem.setAccelerator(SWT.CTRL + SWT.SHIFT + 'S');
+		
 		new MenuItem(filemenu, SWT.SEPARATOR);
 		MenuItem exitItem = new MenuItem(filemenu, SWT.PUSH);
 		exitItem.setText("退出");
@@ -114,6 +122,7 @@ public class Main {
 				fd.setText("打开");
 				fd.setFilterExtensions(filterExt);
 				resultdata2.setText("");
+				input.setText("");
 				filestr = fd.open();
 				if (filestr != null) {
 					try {
@@ -145,6 +154,70 @@ public class Main {
 			}
 		};
 		openItem.addSelectionListener(openListener);
+		saveasItem.addSelectionListener(new SelectionListener() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				FileDialog fd = new FileDialog(shell, SWT.SAVE);
+				fd.setText("另存为");
+				fd.setFilterExtensions(filterExt);
+				String filename = fd.open();
+				if (filename != null) {
+					File file = new File(filename);
+					try {
+						if (!file.exists()) {
+							file.createNewFile();
+						}
+						
+			            FileOutputStream fileOutputStream=new FileOutputStream(file.getAbsoluteFile());  
+			            OutputStreamWriter outputWriter=new OutputStreamWriter(fileOutputStream,"UTF-8"); 
+			            outputWriter.write(codedata.getText());
+//						FileWriter fw = new FileWriter(file.getAbsoluteFile(),"UTF-8");
+//						BufferedWriter bw = new BufferedWriter(fw);
+//						bw.write(codedata.getText());
+//						bw.close();
+//						fw.close();
+						outputWriter.close();  
+			            fileOutputStream.close();  
+						filestr = filename;
+						
+						resultdata2.setText("");
+						input.setText("");
+						//并打开展示到code面板上
+						filestr = fd.open();
+						if (filestr != null) {
+							try {
+								// 从文件中读取数据到程序中
+								BufferedReader br = new BufferedReader(
+										new InputStreamReader(new FileInputStream(filestr), "UTF-8"));
+								final StringBuilder sb = new StringBuilder();
+								String content;
+								while ((content = br.readLine()) != null) { // 每次读一行，读到content中
+									sb.append(content); // 追加
+									sb.append(System.getProperty("line.separator"));
+								}
+								br.close(); // 关闭输入流
+								Display display = codedata.getDisplay();
+								display.asyncExec(new Runnable() {
+									public void run() {
+										codedata.setText(sb.toString());
+									}
+								});
+								lineStyler.parseBlockComments(sb.toString());
+							} catch (FileNotFoundException e1) {
+							} catch (IOException e1) {
+							}
+						}
+					} catch (IOException e1) {
+						// e1.printStackTrace();
+					}
+				}
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
 		
 		final SelectionListener runListener = new SelectionListener() {
 
@@ -172,6 +245,7 @@ public class Main {
 							} 
 							resultdata2.append(Interpreter.result.toString());
 							System.out.println(Interpreter.result.toString());
+							Interpreter.result.setLength(0);
 						}
 					});
 					//在完成语法分析后在此加可执行文件
@@ -316,13 +390,24 @@ public class Main {
 		fd.top = new FormAttachment(50, 24);
 		fd.left = new FormAttachment(0, 1);
 		fd.bottom = new FormAttachment(100, -1);
-		fd.right = new FormAttachment(100, -1);
+		fd.right = new FormAttachment(80, -1);
 		resultdata2.setLayoutData(fd);
 		resultdata2.setEditable(true);
 		resultdata2.setAlwaysShowScrollBars(false);
 		resultdata2.setBackgroundImage(new Image(display,"res//background.png"));
+		
+		fd = new FormData();
+		fd.top = new FormAttachment(50, 24);
+		fd.left = new FormAttachment(80, 1);
+		fd.bottom = new FormAttachment(100, -1);
+		fd.right = new FormAttachment(100, -1);
+		input.setLayoutData(fd);
+		input.setEditable(true);
+		input.setAlwaysShowScrollBars(false);
+		
 		// 主要布局结束
-
+		
+		
 		shell.open();
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch())
