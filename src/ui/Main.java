@@ -3,6 +3,7 @@ package ui;
 import java.awt.Color;
 import java.awt.Label;
 import java.awt.Point;
+import java.awt.TextArea;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -15,6 +16,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.LinkedList;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -22,10 +24,12 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
@@ -50,6 +54,7 @@ public class Main {
 	final static Shell shell = new Shell(display);
 	public static final  StyledText resultdata2  = new StyledText(shell, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.WRAP);
 	public static final  StyledText input  = new StyledText(shell, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.WRAP);
+	public static final  StyledText  inputTag = new StyledText(shell, SWT.MULTI | SWT.BORDER | SWT.WRAP);
 	public static void main(String[] args) {
 		final StyledText codedata = new StyledText(shell, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.WRAP);
 		final JavaLineStyler lineStyler = new JavaLineStyler();
@@ -401,9 +406,27 @@ public class Main {
 		fd.left = new FormAttachment(80, 1);
 		fd.bottom = new FormAttachment(100, -1);
 		fd.right = new FormAttachment(100, -1);
+		inputTag.setLayoutData(fd);
+		inputTag.setEditable(false);
+		inputTag.setAlwaysShowScrollBars(false);
+		inputTag.setText("Input box");
+		Font font = new Font(shell.getDisplay(), "Courier", 15, SWT.BOLD);
+		inputTag.setFont(font);
+		org.eclipse.swt.graphics.Color green = display.getSystemColor(SWT.COLOR_BLUE);
+		StyleRange[] ranges = new StyleRange[1];
+		ranges[0] = new StyleRange(0, 9, green, null);
+		inputTag.replaceStyleRanges(0, 9, ranges);
+		
+		fd = new FormData();
+		fd.top = new FormAttachment(53, 24);
+		fd.left = new FormAttachment(80, 1);
+		fd.bottom = new FormAttachment(100, -1);
+		fd.right = new FormAttachment(100, -1);
 		input.setLayoutData(fd);
 		input.setEditable(true);
 		input.setAlwaysShowScrollBars(false);
+		
+		
 		
 		// 主要布局结束
 		
