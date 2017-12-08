@@ -114,7 +114,8 @@ public enum TreeNodeType {
 	 DIV,
 	 
 	 TERM_EXP, 
-	 FOR_STMT,
+	 FOR_STMT, 
+	 STRING, //字符串字面常量
 	
 
 

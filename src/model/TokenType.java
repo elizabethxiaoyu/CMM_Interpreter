@@ -31,5 +31,8 @@ public enum TokenType {
 	TRUE,							//true
 	FALSE		,					//false
 	PRINT         ,                  //单行输出
-	FOR
+	FOR,
+	REFRENCE, 				 //"
+	STRING ,    				//字符串
+	
 }

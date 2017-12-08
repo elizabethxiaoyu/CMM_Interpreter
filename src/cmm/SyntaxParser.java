@@ -50,6 +50,9 @@ public class SyntaxParser {
 			consumeNextToken(TokenType.LCOMMENT);
 			consumeNextToken(TokenType.RCOMMENT);
 			break;
+		case REFRENCE:
+			consumeNextToken(TokenType.REFRENCE);
+			return parseString();
 		case INT:
 		case DOUBLE:
 				return parseVarDecl();
@@ -82,6 +85,19 @@ public class SyntaxParser {
 		}
 		return null;
 
+	}
+	/**
+	 * 解析字面常量值（字符串）
+	 * @return
+	 */
+	private static TreeNode parseString() {
+		consumeNextToken(TokenType.STRING);
+		TreeNode treeNode = new TreeNode(TreeNodeType.STRING);
+		treeNode.setValue(currentToken.getValue());
+		treeNode.setLineNo(currentToken.getLineNo());
+		
+		consumeNextToken(TokenType.REFRENCE);
+		return  treeNode;
 	}
 	/**
 	 * TODO 完成for循环
@@ -139,7 +155,12 @@ public class SyntaxParser {
 		treeNode.setLineNo(currentToken.getLineNo());
 		consumeNextToken(TokenType.LPARENT);
 		treeNode.setLeft(new TreeNode(TreeNodeType.LPARENT, "(",currentToken.getLineNo()));
-		treeNode.setMiddle(parseExpr());
+		if(getNextTokenType() == TokenType.REFRENCE){
+			consumeNextToken(TokenType.REFRENCE);
+			treeNode.setMiddle(parseString());
+		}
+		else
+			treeNode.setMiddle(parseExpr());
 		consumeNextToken(TokenType.RPARENT);
 		treeNode.setRight(new TreeNode(TreeNodeType.RPARENT, ")",currentToken.getLineNo()));
 		consumeNextToken(TokenType.SEMI);
@@ -155,7 +176,12 @@ public class SyntaxParser {
 			treeNode.setLineNo(currentToken.getLineNo());
 			consumeNextToken(TokenType.LPARENT);
 			treeNode.setLeft(new TreeNode(TreeNodeType.LPARENT, "(",currentToken.getLineNo()));
-			treeNode.setMiddle(parseExpr());
+			if(getNextTokenType() == TokenType.REFRENCE){
+				consumeNextToken(TokenType.REFRENCE);
+				treeNode.setMiddle(parseString());
+			}
+			else
+				treeNode.setMiddle(parseExpr());
 			consumeNextToken(TokenType.RPARENT);
 			treeNode.setRight(new TreeNode(TreeNodeType.RPARENT, ")",currentToken.getLineNo()));
 			consumeNextToken(TokenType.SEMI);

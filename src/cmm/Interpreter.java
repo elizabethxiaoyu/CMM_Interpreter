@@ -16,13 +16,13 @@ import model.Value;
 public class Interpreter {
 	static int mLevel = 0;
 	static SymbolTable symbolTable = SymbolTable.getSymbolTable();
-	static java.util.regex.Pattern pattern = Pattern.compile("(-)+[0-9]*(\\.?)[0-9]*");
-	static java.util.regex.Pattern pattern2 = Pattern.compile("[-]?[0-9]*(\\.?)[0]");
+	static java.util.regex.Pattern pattern = Pattern.compile("(-)+[0-9]*(\\.?)[0-9]*"); // 小数
+	static java.util.regex.Pattern pattern2 = Pattern.compile("[-]?[0-9]*(\\.?)[0]"); // 整数的小数形式
 	public static StringBuilder result = new StringBuilder();
 
-	public static void interpreter(LinkedList<TreeNode> tree) throws InterpretException {
+	public static void interpreter(LinkedList<TreeNode> trees) throws InterpretException {
 
-		for (TreeNode root : tree) {
+		for (TreeNode root : trees) {
 			if (root != null)
 				interpreterStmt(root);
 		}
@@ -39,7 +39,7 @@ public class Interpreter {
 		case PRINT_STMT:
 			interpreterPRINT(root);
 			break;
-		case BREAK_STMT: // 这里还要测试
+		case BREAK_STMT:
 			break;
 		case READ_STMT:
 			interpreterREAD(root);
@@ -66,7 +66,7 @@ public class Interpreter {
 	 * 
 	 * d[1] = 9; write(d[1]); int[3] e ; write(e[0]); e[3] = 8;
 	 * 
-	 * 目前的问题是给iNT类型的赋值小数，会自动截断 还有1.0这样的小数直接显示1
+	 *
 	 * 
 	 * @param root
 	 * @throws InterpretException
@@ -182,28 +182,38 @@ public class Interpreter {
 	}
 
 	private static void interpreterWRITE(TreeNode root) throws InterpretException {
-		String s = String.valueOf(interpreterExpr(root.getMiddle()).getData());
-		if (pattern2.matcher(s).matches() && interpreterExpr(root.getMiddle()).getDataType() == TokenType.LITERAL_INT) {
-			System.out.println(((int) Double.parseDouble(s)));
-			result.append(String.valueOf(((int) Double.parseDouble(s))) + "\n");
+		if (root.getMiddle().getType() == TreeNodeType.STRING) {
+			result.append(root.getMiddle().getValue() + "\n");
 		} else {
-			System.out.println(s);
-			result.append(s + "\n");
+			String s = String.valueOf(interpreterExpr(root.getMiddle()).getData());
+			if (pattern2.matcher(s).matches()
+					&& interpreterExpr(root.getMiddle()).getDataType() == TokenType.LITERAL_INT) {
+				System.out.println(((int) Double.parseDouble(s)));
+				result.append(String.valueOf(((int) Double.parseDouble(s))) + "\n");
+			} else {
+				System.out.println(s);
+				result.append(s + "\n");
+			}
 		}
-
 	}
 
+	// 输出不换行
 	private static void interpreterPRINT(TreeNode root) throws InterpretException {
-		String s = String.valueOf(interpreterExpr(root.getMiddle()).getData());
-		if (pattern2.matcher(s).matches() && interpreterExpr(root.getMiddle()).getDataType() == TokenType.LITERAL_INT) {
-			System.out.print(((int) Double.parseDouble(s)));
-			result.append(String.valueOf(((int) Double.parseDouble(s))) + "\n");
+		if (root.getMiddle().getType() == TreeNodeType.STRING) {
+			result.append(root.getMiddle().getValue() + "\n");
 		} else {
-			System.out.print(s);
-			result.append(s + "\n");
+			String s = String.valueOf(interpreterExpr(root.getMiddle()).getData());
+			if (pattern2.matcher(s).matches()
+					&& interpreterExpr(root.getMiddle()).getDataType() == TokenType.LITERAL_INT) {
+				System.out.print(((int) Double.parseDouble(s)));
+				result.append(String.valueOf(((int) Double.parseDouble(s))) + "\n");
+			} else {
+				System.out.print(s);
+				result.append(s + "\n");
+			}
 		}
 	}
-	
+
 	/**
 	 * int a; read(a); write(a);
 	 * 
@@ -220,13 +230,13 @@ public class Interpreter {
 
 		SymbolType type = symbolTable.getSymbolType(root.getMiddle().getLeft().getValue());
 		Value value = new Value(type);
-	//	Scanner sc = new Scanner(System.in);
+		// Scanner sc = new Scanner(System.in); //注释部分是采用控制台输入的方式
 		String input = ui.Main.input.getText();
-		
+
 		switch (type) {
 		case SINGLE_INT:
 			try {
-				//value.setInt(sc.nextInt());
+				// value.setInt(sc.nextInt());
 				value.setInt(Integer.parseInt(input));
 				symbolTable.setSymbolValue(root.getMiddle().getLeft().getValue(), value);
 			} catch (InputMismatchException e) {
@@ -238,24 +248,25 @@ public class Interpreter {
 			}
 			break;
 		case SINGLE_DOUBLE:
-			//value.setDouble(sc.nextDouble());
+			// value.setDouble(sc.nextDouble());
 			value.setDouble(Double.parseDouble(input));
 			symbolTable.setSymbolValue(root.getMiddle().getLeft().getValue(), value);
 			break;
 		case ARRAY_INT:
 			if (root.getMiddle().getLeft().getLeft() == null) {// 赋值整个数组
 				int[] array = symbolTable.getSymbolValue(root.getMiddle().getLeft().getValue()).getArrayInt();
-//				for (int i = 0; i < array.length; i++)
-//					array[i] = sc.nextInt();
-				String[]  result = input.split("\r\n");
-				for(int i = 0;i< array.length;i++){
+				// for (int i = 0; i < array.length; i++)
+				// array[i] = sc.nextInt();
+				String[] result = input.split("\r\n");
+				for (int i = 0; i < array.length; i++) {
 					array[i] = Integer.parseInt(result[i]);
 				}
-				
+
 			} else {// 赋值数组中某个元素
 				interpreterExpr(root.getMiddle().getLeft().getMiddle());
-//				symbolTable.setSymbolValue(root.getMiddle().getLeft().getValue(), sc.nextInt(),
-//						(int) root.getMiddle().getLeft().getMiddle().getData());
+				// symbolTable.setSymbolValue(root.getMiddle().getLeft().getValue(),
+				// sc.nextInt(),
+				// (int) root.getMiddle().getLeft().getMiddle().getData());
 				symbolTable.setSymbolValue(root.getMiddle().getLeft().getValue(), Integer.parseInt(input),
 						(int) root.getMiddle().getLeft().getMiddle().getData());
 			}
@@ -263,18 +274,19 @@ public class Interpreter {
 		case ARRAY_DOUBLE:
 			if (root.getMiddle().getLeft().getLeft() == null) {// 赋值整个数组
 				double[] array2 = symbolTable.getSymbolValue(root.getMiddle().getLeft().getValue()).getArrayDouble();
-//				for (int i = 0; i < array2.length; i++)
-//					array2[i] = sc.nextDouble();
-				String[]  result = input.split("\r\n");
-				for(int i = 0;i< array2.length;i++){
+				// for (int i = 0; i < array2.length; i++)
+				// array2[i] = sc.nextDouble();
+				String[] result = input.split("\r\n");
+				for (int i = 0; i < array2.length; i++) {
 					array2[i] = Double.parseDouble(result[i]);
 				}
-				
+
 			} else {
 				// 赋值数组中某个元素
 				interpreterExpr(root.getMiddle().getLeft().getMiddle());
-//				symbolTable.setSymbolValue(root.getMiddle().getLeft().getValue(), sc.nextDouble(),
-//						(int) root.getMiddle().getLeft().getMiddle().getData());
+				// symbolTable.setSymbolValue(root.getMiddle().getLeft().getValue(),
+				// sc.nextDouble(),
+				// (int) root.getMiddle().getLeft().getMiddle().getData());
 				symbolTable.setSymbolValue(root.getMiddle().getLeft().getValue(), Double.parseDouble(input),
 						(int) root.getMiddle().getLeft().getMiddle().getData());
 			}
@@ -290,7 +302,7 @@ public class Interpreter {
 	}
 
 	/**
-	 * int b = 1; while(b <= 2){ b = b+1 ; write(b); } write(b);
+	 * 解析WHILE语句 int b = 1; while(b <= 2){ b = b+1 ; write(b); } write(b);
 	 * 
 	 * @param root
 	 * @throws InterpretException
@@ -350,6 +362,13 @@ public class Interpreter {
 
 	}
 
+	/**
+	 * 解析表达式结点
+	 * 
+	 * @param root
+	 * @return
+	 * @throws InterpretException
+	 */
 	private static TreeNode interpreterExpr(TreeNode root) throws InterpretException {
 		if (root.getLeft() == null) { // 此表达式是标识符或字面值
 			if (root.getType() == TreeNodeType.ID) {

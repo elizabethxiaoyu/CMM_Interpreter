@@ -80,6 +80,18 @@ public class Lexer {
 				tokenList.add(new Token(TokenType.RBRACE,"}", lineNo));
 				readChar();
 				continue;
+			case '"':
+				tokenList.add(new Token(TokenType.REFRENCE,"\"",lineNo));
+				readChar();
+				StringBuilder sbb = new StringBuilder();
+				while(currentChar != '"'){
+					sbb.append(currentChar);
+					readChar();
+				}
+				tokenList.add(new Token(TokenType.STRING, sbb.toString(),lineNo));
+				tokenList.add(new Token(TokenType.REFRENCE,"\"",lineNo));
+				readChar();
+				continue;
 			case '!':
 				readChar();
 				if(currentChar == '='){
