@@ -12,9 +12,11 @@ public class Value {
 	 */
 	private SymbolType mType;
 	private int mInt;
+	private String mString;
 	private double mDouble;
 	private int[] mArrayInt;
 	private double[] mArrayDouble;
+	private String[] mArrayString;
 
 	/**
 	 * 创建一个type型值对象
@@ -87,6 +89,23 @@ public class Value {
 		this.mArrayDouble = mArrayReal;
 	}
 
+	
+	public String getString() {
+		return mString;
+	}
+
+	public void setString(String mString) {
+		this.mString = mString;
+	}
+
+	public String[] getArrayString() {
+		return mArrayString;
+	}
+
+	public void setArrayString(String[] mArrayString) {
+		this.mArrayString = mArrayString;
+	}
+
 	/**
 	 * 初始化数组
 	 * 
@@ -96,8 +115,10 @@ public class Value {
 	public void initArray(int dim) {
 		if (mType == SymbolType.ARRAY_INT) {
 			mArrayInt = new int[dim];
-		} else {
+		} else if(mType == SymbolType.ARRAY_DOUBLE) {
 			mArrayDouble = new double[dim];
+		} else{
+			mArrayString = new String[dim];
 		}
 	}
 

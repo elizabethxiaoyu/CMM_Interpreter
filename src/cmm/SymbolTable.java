@@ -121,6 +121,23 @@ public class SymbolTable {
 		}
 
 	}
+	
+	/**
+	 * 给符号表中的符号赋值--字符串数组
+	 * 
+	 * @param name
+	 * @param value
+	 * @param index
+	 * @throws InterpretException
+	 */
+	public void setSymbolValue(String name, String value, int index) throws InterpretException {
+		if (getSymbol(name).getValue().getArrayString().length > index) {
+			getSymbol(name).getValue().getArrayString()[index] = value;
+		} else {
+			throw new InterpretException("数组 <" + name + "> 下标 " + index + " 越界");
+		}
+
+	}
 
 	/**
 	 * 给符号表中的符号赋值--浮点数数组
@@ -131,7 +148,11 @@ public class SymbolTable {
 	 * @throws InterpretException
 	 */
 	public void setSymbolValue(String name, double value, int index) throws InterpretException {
-		getSymbol(name).getValue().getArrayDouble()[index] = value;
+		if (getSymbol(name).getValue().getArrayDouble().length > index) {
+			getSymbol(name).getValue().getArrayDouble()[index] = value;
+		} else {
+			throw new InterpretException("数组 <" + name + "> 下标 " + index + " 越界");
+		}
 	}
 
 	/**
@@ -176,14 +197,20 @@ public class SymbolTable {
 				throw new InterpretException("数组 <" + name + "> 下标 " + index + " 越界");
 			} else if (s.getType() == SymbolType.ARRAY_DOUBLE && s.getValue().getArrayDouble().length < index + 1) {
 				throw new InterpretException("数组 <" + name + "> 下标 " + index + " 越界");
+			}else if (s.getType() == SymbolType.ARRAY_STRING&& s.getValue().getArrayString().length < index + 1) {
+				throw new InterpretException("数组 <" + name + "> 下标 " + index + " 越界");
 			}
 			if (s.getType() == SymbolType.ARRAY_INT) {
 				Value rv = new Value(SymbolType.SINGLE_INT);
 				rv.setInt(s.getValue().getArrayInt()[index]);
 				return rv;
-			} else {
+			} else if (s.getType() == SymbolType.ARRAY_DOUBLE){
 				Value rv = new Value(SymbolType.SINGLE_DOUBLE);
 				rv.setDouble(s.getValue().getArrayDouble()[index]);
+				return rv;
+			}else{
+				Value rv = new Value(SymbolType.SINGLE_STRING);
+				rv.setString(s.getValue().getArrayString()[index]);
 				return rv;
 			}
 		}

@@ -88,7 +88,7 @@ public class Lexer {
 					sbb.append(currentChar);
 					readChar();
 				}
-				tokenList.add(new Token(TokenType.STRING, sbb.toString(),lineNo));
+				tokenList.add(new Token(TokenType.LITERAL_STRING, sbb.toString(),lineNo));
 				tokenList.add(new Token(TokenType.REFRENCE,"\"",lineNo));
 				readChar();
 				continue;
@@ -277,6 +277,9 @@ public class Lexer {
 				} else if (sbString.equals("double")) {
 					token.setType(TokenType.DOUBLE);
 					token.setValue("double");
+				}else if(sbString.equals("string")){
+					token.setType(TokenType.STRING);
+					token.setValue("string");
 				} else {
 					if (sbString.matches("^\\w+$") && sbString.substring(0,1).matches("[A-Za-z]")) {
 						token.setType(TokenType.ID);

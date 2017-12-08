@@ -55,6 +55,7 @@ public class SyntaxParser {
 			return parseString();
 		case INT:
 		case DOUBLE:
+		case STRING:
 				return parseVarDecl();
 		case IF:
 			return parseIfStmt();
@@ -91,8 +92,8 @@ public class SyntaxParser {
 	 * @return
 	 */
 	private static TreeNode parseString() {
-		consumeNextToken(TokenType.STRING);
-		TreeNode treeNode = new TreeNode(TreeNodeType.STRING);
+		consumeNextToken(TokenType.LITERAL_STRING);
+		TreeNode treeNode = new TreeNode(TreeNodeType.LITERAL_STRING);
 		treeNode.setValue(currentToken.getValue());
 		treeNode.setLineNo(currentToken.getLineNo());
 		
@@ -201,7 +202,9 @@ public class SyntaxParser {
 			node.setRight(new TreeNode(TreeNodeType.RBRACKET, "]",currentToken.getLineNo()));
 		} else {
 			TreeNode node = new TreeNode(TreeNodeType.ID, currentToken.getValue(),currentToken.getLineNo());
+			node.setString(currentToken.getValue());
 			treeNode.setLeft(node);
+			treeNode.setString(node.getString());
 		}
 		treeNode.setLineNo(treeNode.getLeft().getLineNo());
 		return treeNode;
@@ -284,6 +287,7 @@ public class SyntaxParser {
 			node.setLeft(leftNode);
 		}
 		node.setLineNo(node.getLeft().getLineNo());
+		node.setString(node.getLeft().getString());
 		return node;
 	}
 
@@ -296,6 +300,7 @@ public class SyntaxParser {
 		TreeNode node = new TreeNode(TreeNodeType.ADDTIVE_EXP);
 		node.setDataType(TokenType.ADDTIVE_EXP);
 		TreeNode leftNode = term();
+		node.setString(leftNode.getString());
 		if (checkNextTokenType(TokenType.PLUS)) {
 			node.setLeft(leftNode);
 			node.setMiddle(addtiveOp());
@@ -324,6 +329,7 @@ public class SyntaxParser {
 		TreeNode node = new TreeNode(TreeNodeType.TERM_EXP);
 		node.setDataType(TokenType.TERM_EXP);
 		TreeNode leftNode = factor();
+		node.setString(leftNode.getString());
 		if (checkNextTokenType(TokenType.MUL, TokenType.DIV)) {
 			node.setLeft(leftNode);
 			node.setMiddle(multiplyOp());
@@ -349,6 +355,11 @@ public class SyntaxParser {
 				expNode.setLeft(parseConstant());
 				expNode.setLineNo(expNode.getLeft().getLineNo());
 				expNode.setDataType(expNode.getLeft().getDataType());
+				break;
+			case REFRENCE:
+				consumeNextToken(TokenType.REFRENCE);
+				expNode.setLeft(parseString());
+				expNode.setLineNo(expNode.getLeft().getLineNo());
 				break;
 			case LPARENT:
 				consumeNextToken(TokenType.LPARENT);
@@ -506,7 +517,10 @@ public class SyntaxParser {
 		TreeNode treeNode = new TreeNode(TreeNodeType.INTIA);
 		consumeNextToken(TokenType.ASSIGN);
 		treeNode.setLeft(new TreeNode(TreeNodeType.ASSIGN,"=",currentToken.getLineNo()));
-		treeNode.setMiddle(parseExpr());
+		if(getNextTokenType() == TokenType.LITERAL_STRING)
+			treeNode.setMiddle(parseString());
+		else
+			treeNode.setMiddle(parseExpr());
 		treeNode.setLineNo(currentToken.getLineNo());
 		return treeNode;
 	}
@@ -520,6 +534,9 @@ public class SyntaxParser {
 		} else if (getNextTokenType() == TokenType.DOUBLE) {
 			consumeNextToken(TokenType.DOUBLE);
 			treeNode.setLeft(new TreeNode(TreeNodeType.DOUBLE, "double",currentToken.getLineNo()));
+		}else if(getNextTokenType() == TokenType.STRING){
+			consumeNextToken(TokenType.STRING);
+			treeNode.setLeft(new TreeNode(TreeNodeType.STRING, "string",currentToken.getLineNo()));
 		}
 
 		if (getNextTokenType() == TokenType.LBRACKET) {

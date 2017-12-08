@@ -33,6 +33,6 @@ public enum TokenType {
 	PRINT         ,                  //单行输出
 	FOR,
 	REFRENCE, 				 //"
-	STRING ,    				//字符串
-	
+	LITERAL_STRING ,    				//字符串
+	STRING               ,                 //字符串标识符
 }

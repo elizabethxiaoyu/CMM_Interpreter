@@ -115,8 +115,8 @@ public enum TreeNodeType {
 	 
 	 TERM_EXP, 
 	 FOR_STMT, 
-	 STRING, //字符串字面常量
-	
+	 LITERAL_STRING, //字符串字面常量
+	STRING                 //字符串关键字
 
 
 }

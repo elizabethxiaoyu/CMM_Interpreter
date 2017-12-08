@@ -13,7 +13,7 @@ public class TreeNode {
 	//存储字符串形式的值（变量名）
 	private String value;
 	private double mData;
-	
+	private String mString;
 	 // 如果是代码块中的代码,则mNext指向其后面的一条语句 普通的顶级代码都是存在linkedlist中,不需要使用这个参数
 	private TreeNode mNext;
 	
@@ -46,6 +46,13 @@ public class TreeNode {
 		}
 	}
 	
+	
+	public String getString() {
+		return mString;
+	}
+	public void setString(String mString) {
+		this.mString = mString;
+	}
 	public boolean getBoolean() {
 		return mBoolean;
 	}

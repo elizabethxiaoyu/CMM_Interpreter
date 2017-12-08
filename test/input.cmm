@@ -1,5 +1,5 @@
-int i = 0 ;
-if(i == 0){
-	read(i);
-}
-write(i);
+string[2] s;
+s[0] = "Alice";
+s[1] = "Liu";
+write(s[0]);
+write(s[1]);
