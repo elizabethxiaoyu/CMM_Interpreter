@@ -53,6 +53,9 @@ public class Interpreter {
 		case ASSIGN_STMT:
 			interpreterASSIGN(root);
 			break;
+		case FOR_STMT:
+			interpreterFOR(root);
+			break;
 		default:
 			break;
 
@@ -362,6 +365,24 @@ public class Interpreter {
 			mLevel--;
 		}
 	}
+	
+	/**
+	 * 解析FOR语句int sum = 0; for(int i = 0; i < 5; i = i + 1){ sum = sum + i; } write(sum);
+	 * 
+	 * @param root
+	 * @throws InterpretException
+	 */
+	private static void interpreterFOR(TreeNode root) throws InterpretException {
+		interpreterStmt(root.getLeft().getLeft());
+		while (interpreterExpr(root.getLeft().getMiddle()).getBoolean() == true) {
+			mLevel++;
+			interpreterStmtList(root.getMiddle());
+			symbolTable.deregister(mLevel);
+			mLevel--;
+			interpreterStmt(root.getLeft().getRight());
+		}
+	}
+	
 
 	/**
 	 * 解释语法树中IF结点 int a = 1; if(a < 2){ a = a+1; } write(a);

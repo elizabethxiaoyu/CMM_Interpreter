@@ -104,13 +104,31 @@ public class SyntaxParser {
 	 * TODO 完成for循环
 	 * @return
 	 */
-	private static TreeNode parseForStmt() {
+	private static TreeNode parseForStmt() throws ParserException{
 		consumeNextToken(TokenType.FOR);
-		TreeNode treeNode =  new TreeNode(TreeNodeType.FOR_STMT);
-		treeNode.setLineNo(currentToken.getLineNo());
+		TreeNode treeNode =  new TreeNode(TreeNodeType.FOR_STMT, "for", currentToken.getLineNo());
 		consumeNextToken(TokenType.LPARENT);
-		return null;
+		treeNode.setLeft(parseForJudgeList());
+		consumeNextToken(TokenType.RPARENT);
+		consumeNextToken(TokenType.LBRACE);
+		treeNode.setMiddle(parseStmtList());
+		consumeNextToken(TokenType.RBRACE);
+		return treeNode;
 	}
+	
+	private static TreeNode parseForJudgeList() throws ParserException{
+		TreeNode treeNode = new TreeNode(TreeNodeType.FOR_JUDGE_LIST, "for_judge_list", currentToken.getLineNo());
+		if (getNextTokenType() == TokenType.ID) {
+			treeNode.setLeft(parseAssignStmt());
+		} else {
+			treeNode.setLeft(parseVarDecl());
+		}
+		treeNode.setMiddle(parseExpr());
+		consumeNextToken(TokenType.SEMI);
+		treeNode.setRight(parseStmt());
+		return treeNode;
+	}
+	
 	private static TreeNode parseBreakStmt() throws ParserException {
 		consumeNextToken(TokenType.BREAK);
 		TreeNode treeNode = new TreeNode(TreeNodeType.BREAK_STMT);
@@ -234,7 +252,8 @@ public class SyntaxParser {
 		consumeNextToken(TokenType.ASSIGN);
 		treeNode.setMiddle(new TreeNode(TreeNodeType.ASSIGN, "=",currentToken.getLineNo()));	
 		treeNode.setRight(parseExpr());
-		consumeNextToken(TokenType.SEMI);
+		if(getNextTokenType() != TokenType.LPARENT)
+			consumeNextToken(TokenType.SEMI);
 		return treeNode;
 	}
 
