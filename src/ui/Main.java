@@ -1,6 +1,7 @@
 package ui;
 
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,6 +19,9 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.ShellAdapter;
@@ -398,6 +402,32 @@ public class Main {
 			}
 		});
 		codedata.addLineStyleListener(lineStyler);
+		
+		//双击设置、删除断点
+		codedata.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseDoubleClick(MouseEvent e) {
+				// TODO Auto-generated method stub
+				int line = codedata.getLineAtOffset(codedata.getCaretOffset());
+				if(codedata.getLineBackground(line) != null) {
+					codedata.setLineBackground(line, 1, null);
+					//TODO 删除中断节点
+				}
+				else {
+					codedata.setLineBackground(line, 1, shell.getDisplay().getSystemColor(SWT.COLOR_CYAN));
+					//TODO 添加中断节点
+				}
+			}
+
+			@Override
+			public void mouseDown(MouseEvent arg0) { }
+
+			@Override
+			public void mouseUp(MouseEvent arg0) { }
+			
+		});
+		
 		
 		fd = new FormData();
 		fd.top = new FormAttachment(50, 24);
