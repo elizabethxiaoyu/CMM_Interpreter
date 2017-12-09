@@ -252,7 +252,7 @@ public class SyntaxParser {
 		consumeNextToken(TokenType.ASSIGN);
 		treeNode.setMiddle(new TreeNode(TreeNodeType.ASSIGN, "=",currentToken.getLineNo()));	
 		treeNode.setRight(parseExpr());
-		if(getNextTokenType() != TokenType.LPARENT)
+		if(getNextTokenType() != TokenType.RPARENT)
 			consumeNextToken(TokenType.SEMI);
 		return treeNode;
 	}
