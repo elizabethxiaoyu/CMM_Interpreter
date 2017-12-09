@@ -21,7 +21,8 @@ public class Interpreter {
 	public static StringBuilder result = new StringBuilder();
 
 	public static void interpreter(LinkedList<TreeNode> trees) throws InterpretException {
-
+		symbolTable.deleteTable();
+		symbolTable.newTable();
 		for (TreeNode root : trees) {
 			if (root != null)
 				interpreterStmt(root);
@@ -126,7 +127,7 @@ public class Interpreter {
 						e.printStackTrace();
 					}
 				} else {
-					symbolTable.setSymbolValue(node.getLeft().getValue(), root.getRight().getData(),
+					symbolTable.setSymbolValue(node.getLeft().getValue(),root.getRight().getString(),
 							(int) (node.getLeft().getMiddle().getData()));
 
 				}
@@ -216,7 +217,7 @@ public class Interpreter {
 				value.setType(SymbolType.SINGLE_STRING);
 				TreeNode node = root.getMiddle().getLeft().getLeft();
 				if (node != null && node.getType() == TreeNodeType.INTIA) {
-					value.setString(node.getMiddle().getValue());
+					value.setString(interpreterExpr(node.getMiddle()).getString());
 				}
 				// 默认初始化为""
 				else {
@@ -440,15 +441,16 @@ public class Interpreter {
 	private static TreeNode interpreterExpr(TreeNode root) throws InterpretException {
 		if (root.getLeft() == null) { // 此表达式是标识符或字面值
 			if (root.getType() == TreeNodeType.ID) {
-		
+				System.out.println("hahah" + root.getString() + "   " +symbolTable.getSymbolValue(root.getValue()).getType());
 				if (symbolTable.getSymbolValue(root.getValue()).getType() == SymbolType.SINGLE_INT) {
 					root.setData(symbolTable.getSymbolValue(root.getValue()).getInt());
 					root.setDataType(TokenType.LITERAL_INT);
 				} else if (symbolTable.getSymbolValue(root.getValue()).getType() == SymbolType.SINGLE_DOUBLE) {
 					root.setData(symbolTable.getSymbolValue(root.getValue()).getDouble());
 					root.setDataType(TokenType.LITERAL_DOUBLE);
-				} else {
+				} else {	
 					root.setString(symbolTable.getSymbolValue(root.getValue()).getString());
+					System.out.println("liu" + root.getValue() + "   " +symbolTable.getSymbolValue(root.getValue()).getType());
 				}
 				root.setBoolean(!(root.getData() == 0));
 			} else {
@@ -474,7 +476,7 @@ public class Interpreter {
 				root.setBoolean(!(root.getData() == 0));
 				return root;
 			} else {
-				root.setString(root.getLeft().getString());
+				root.setString(interpreterExpr(root.getLeft()).getString());
 			}
 		}
 		if (root.getType() == TreeNodeType.ARRAY) {
@@ -573,5 +575,4 @@ public class Interpreter {
 
 		return root;
 	}
-
 }
