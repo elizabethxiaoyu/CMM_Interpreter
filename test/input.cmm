@@ -1,5 +1,2 @@
-string[2] s;
-s[0] = "Alice";
-s[1] = "Liu";
-write(s[0]);
-write(s[1]);
+string s  = "Alice";
+write(s);

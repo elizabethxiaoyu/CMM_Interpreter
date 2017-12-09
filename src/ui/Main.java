@@ -199,12 +199,12 @@ public class Main {
 									sb.append(System.getProperty("line.separator"));
 								}
 								br.close(); // 关闭输入流
-								Display display = codedata.getDisplay();
-								display.asyncExec(new Runnable() {
-									public void run() {
-										codedata.setText(sb.toString());
-									}
-								});
+//								Display display = codedata.getDisplay();
+//								display.asyncExec(new Runnable() {
+//									public void run() {
+									codedata.setText(sb.toString());
+//									}
+//								});
 								lineStyler.parseBlockComments(sb.toString());
 							} catch (FileNotFoundException e1) {
 							} catch (IOException e1) {
@@ -230,7 +230,7 @@ public class Main {
 					display.asyncExec(new Runnable() {
 						public void run() {
 							resultdata2.setText("Result:"+"\n");
-						
+							
 							try {
 								LinkedList<Token> l = SyntaxParser.getTokenList(filestr);
 								LinkedList<TreeNode> tree = SyntaxParser.syntaxAnalyse(l);
