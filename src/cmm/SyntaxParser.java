@@ -188,7 +188,11 @@ public class SyntaxParser {
 			consumeNextToken(TokenType.SEMI);
 			return treeNode;
 		}
-
+	/**
+	 * 语法分析变量
+	 * @return
+	 * @throws ParserException
+	 */
 	private static TreeNode parseVariable() throws ParserException {
 		consumeNextToken(TokenType.ID);
 		TreeNode treeNode = new TreeNode(TreeNodeType.VAR);
