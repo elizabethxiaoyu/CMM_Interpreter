@@ -11,10 +11,10 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.widgets.Text;
 
 public class ParserException extends Exception {
 	private static final long serialVersionUID = 1L;
+	
 	public ParserException(String msg){
 		super(msg);
 	}
@@ -25,12 +25,16 @@ public class ParserException extends Exception {
 //		FileWriter fw = new java.io.FileWriter("exception.txt", false);
 //		PrintWriter pw = new PrintWriter(fw);
 //		e.printStackTrace(pw);
+//		fw.close();
+//		pw.close();
 //		FileReader fr  = new FileReader("exception.txt");
 //		BufferedReader bufferedReader = new BufferedReader(fr);
 //        String lineTxt = null;
 //        while((lineTxt = bufferedReader.readLine()) != null){
 //        	resultdata2.append(lineTxt);
 //        }
+//        fr.close();
+//        bufferedReader.close();
 	}
 	
 	@Override
@@ -38,8 +42,6 @@ public class ParserException extends Exception {
 		super.printStackTrace(s);
 		try {
 			printException(ui.Main.resultdata2, this);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

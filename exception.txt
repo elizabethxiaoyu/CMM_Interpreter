@@ -1,0 +1,11 @@
+exception.ParserException: line 4 : The type of next token should be -> SEMI
+	at cmm.SyntaxParser.consumeNextToken(SyntaxParser.java:634)
+	at cmm.SyntaxParser.parseVarDecl(SyntaxParser.java:512)
+	at cmm.SyntaxParser.parseStmt(SyntaxParser.java:59)
+	at cmm.SyntaxParser.syntaxAnalyse(SyntaxParser.java:39)
+	at ui.Main$4$1.run(Main.java:236)
+	at org.eclipse.swt.widgets.RunnableLock.run(Unknown Source)
+	at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Unknown Source)
+	at org.eclipse.swt.widgets.Display.runAsyncMessages(Unknown Source)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Unknown Source)
+	at ui.Main.main(Main.java:444)

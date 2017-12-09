@@ -202,7 +202,6 @@ public class SyntaxParser {
 			node.setRight(new TreeNode(TreeNodeType.RBRACKET, "]",currentToken.getLineNo()));
 		} else {
 			TreeNode node = new TreeNode(TreeNodeType.ID, currentToken.getValue(),currentToken.getLineNo());
-			node.setString(currentToken.getValue());
 			treeNode.setLeft(node);
 			treeNode.setString(node.getString());
 		}

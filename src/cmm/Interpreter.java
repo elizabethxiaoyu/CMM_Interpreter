@@ -419,7 +419,7 @@ public class Interpreter {
 	private static TreeNode interpreterExpr(TreeNode root) throws InterpretException {
 		if (root.getLeft() == null) { // 此表达式是标识符或字面值
 			if (root.getType() == TreeNodeType.ID) {
-				System.out.println(root.getValue() + "  " + root.getType());
+		
 				if (symbolTable.getSymbolValue(root.getValue()).getType() == SymbolType.SINGLE_INT) {
 					root.setData(symbolTable.getSymbolValue(root.getValue()).getInt());
 					root.setDataType(TokenType.LITERAL_INT);
@@ -427,7 +427,6 @@ public class Interpreter {
 					root.setData(symbolTable.getSymbolValue(root.getValue()).getDouble());
 					root.setDataType(TokenType.LITERAL_DOUBLE);
 				} else {
-					System.out.println("hahahha" + root.getValue());
 					root.setString(symbolTable.getSymbolValue(root.getValue()).getString());
 				}
 				root.setBoolean(!(root.getData() == 0));
