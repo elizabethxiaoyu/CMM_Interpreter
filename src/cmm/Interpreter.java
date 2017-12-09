@@ -127,7 +127,7 @@ public class Interpreter {
 						e.printStackTrace();
 					}
 				} else {
-					symbolTable.setSymbolValue(node.getLeft().getValue(),root.getRight().getString(),
+					symbolTable.setSymbolValue(node.getLeft().getValue(),root.getRight().getData(),
 							(int) (node.getLeft().getMiddle().getData()));
 
 				}
@@ -441,7 +441,6 @@ public class Interpreter {
 	private static TreeNode interpreterExpr(TreeNode root) throws InterpretException {
 		if (root.getLeft() == null) { // 此表达式是标识符或字面值
 			if (root.getType() == TreeNodeType.ID) {
-				System.out.println("hahah" + root.getString() + "   " +symbolTable.getSymbolValue(root.getValue()).getType());
 				if (symbolTable.getSymbolValue(root.getValue()).getType() == SymbolType.SINGLE_INT) {
 					root.setData(symbolTable.getSymbolValue(root.getValue()).getInt());
 					root.setDataType(TokenType.LITERAL_INT);
@@ -450,7 +449,6 @@ public class Interpreter {
 					root.setDataType(TokenType.LITERAL_DOUBLE);
 				} else {	
 					root.setString(symbolTable.getSymbolValue(root.getValue()).getString());
-					System.out.println("liu" + root.getValue() + "   " +symbolTable.getSymbolValue(root.getValue()).getType());
 				}
 				root.setBoolean(!(root.getData() == 0));
 			} else {
@@ -536,7 +534,7 @@ public class Interpreter {
 					root.setBoolean(!(root.getData() == 0));
 				} else
 					try {
-						throw new InterpretException("line " + right2.getLineNo() + "Divided by 0 !");
+						throw new InterpretException("line " + right2.getLineNo() + "  Divided by 0 !");
 					} catch (InterpretException e) {
 						e.printStackTrace();
 					}
