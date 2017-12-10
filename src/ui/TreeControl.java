@@ -64,8 +64,8 @@ public class TreeControl extends JScrollPane {
 				tree = iterator.next();
 				int height = this.calHeight(tree);
 				System.out.println("height  "+height);
-				x +=800;
-				hGap =300;
+				x +=2400;
+				hGap =1000;
 				count = 0;
 				displayTree(g, tree, x, 30, hGap);
 				treeNum++;
@@ -94,7 +94,7 @@ public class TreeControl extends JScrollPane {
 				} else {
 					g.drawString(root.getValue() + "", x , y + 4);
 				}
-				hGap-=30;
+				hGap /=1.2;
 				if (root.getLeft() != null) {
 					connectLeftChild(g, x, y, x - hGap, y + vGap);
 					displayTree(g, root.getLeft(), (int)(x -hGap), y + vGap, hGap );
@@ -112,7 +112,7 @@ public class TreeControl extends JScrollPane {
 					displayTree(g, root.getRight(), x + (int)(hGap), y + vGap, hGap );
 
 				}
-				hGap+=30;
+				hGap *= 1.2;
 			}
 
 		}

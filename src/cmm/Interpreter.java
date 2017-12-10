@@ -522,7 +522,6 @@ public class Interpreter {
 			TokenType op = root.getMiddle().getDataType();
 			switch (op) {
 			case PLUS:
-			case MINUS:
 				TreeNode left = interpreterExpr(root.getLeft());
 				TreeNode right = interpreterExpr(root.getRight());
 				if (left.getDataType() == TokenType.LITERAL_DOUBLE || right.getDataType() == TokenType.LITERAL_DOUBLE)
@@ -531,6 +530,40 @@ public class Interpreter {
 					root.setDataType(TokenType.LITERAL_INT);
 				root.setData(left.getData() + right.getData());
 				root.setBoolean(!(root.getData() == 0));
+				break;
+			case MINUS:
+
+				TreeNode left3 = interpreterExpr(root.getLeft());
+				TreeNode right3 = interpreterExpr(root.getRight());
+				if (right3.getMiddle() != null && right3.getMiddle().getDataType() == TokenType.MINUS) {
+					//right3.getMiddle().setDataType(TokenType.PLUS);
+					//right3 = interpreterExpr(right3.getRight());
+					if (left3.getDataType() == TokenType.LITERAL_DOUBLE
+							|| right3.getDataType() == TokenType.LITERAL_DOUBLE)
+						root.setDataType(TokenType.LITERAL_DOUBLE);
+					else
+						root.setDataType(TokenType.LITERAL_INT);
+					root.setData(left3.getData() +right3.getData());
+					root.setBoolean(!(root.getData() == 0));
+				} else if (right3.getMiddle() != null && right3.getMiddle().getDataType() == TokenType.PLUS) {
+				
+					if (left3.getDataType() == TokenType.LITERAL_DOUBLE
+							|| right3.getDataType() == TokenType.LITERAL_DOUBLE)
+						root.setDataType(TokenType.LITERAL_DOUBLE);
+					else
+						root.setDataType(TokenType.LITERAL_INT);
+					root.setData(left3.getData() + right3.getData());
+					root.setBoolean(!(root.getData() == 0));
+				} else {
+					if (left3.getDataType() == TokenType.LITERAL_DOUBLE
+							|| right3.getDataType() == TokenType.LITERAL_DOUBLE)
+						root.setDataType(TokenType.LITERAL_DOUBLE);
+					else
+						root.setDataType(TokenType.LITERAL_INT);
+					root.setData(left3.getData() + right3.getData());
+					root.setBoolean(!(root.getData() == 0));
+				}
+
 				break;
 			case MUL:
 				TreeNode left1 = interpreterExpr(root.getLeft());
@@ -546,14 +579,38 @@ public class Interpreter {
 				TreeNode left2 = interpreterExpr(root.getLeft());
 				TreeNode right2 = interpreterExpr(root.getRight());
 				if (right2.getData() != 0) {
-					if (left2.getDataType() == TokenType.LITERAL_DOUBLE
-							|| right2.getDataType() == TokenType.LITERAL_DOUBLE) {
-						root.setData(left2.getData() / right2.getData());
-						root.setDataType(TokenType.LITERAL_DOUBLE);
+					if (right2.getMiddle() != null && right2.getMiddle().getDataType() == TokenType.DIV) {
+						right2.getMiddle().setDataType(TokenType.MUL);
+						right2 = interpreterExpr(right2);
+						if (left2.getDataType() == TokenType.LITERAL_DOUBLE
+								|| right2.getDataType() == TokenType.LITERAL_DOUBLE) {
+							root.setData(left2.getData() / right2.getData());
+							root.setDataType(TokenType.LITERAL_DOUBLE);
+						} else {
+							root.setData((int) (left2.getData() / right2.getData()));
+							root.setDataType(TokenType.LITERAL_INT);
+						}
+					} else if (right2.getMiddle() != null && right2.getMiddle().getDataType() == TokenType.MUL) {
+						// 待修改
+						if (left2.getDataType() == TokenType.LITERAL_DOUBLE
+								|| right2.getDataType() == TokenType.LITERAL_DOUBLE) {
+							root.setData(left2.getData() / right2.getData());
+							root.setDataType(TokenType.LITERAL_DOUBLE);
+						} else {
+							root.setData((int) (left2.getData() / right2.getData()));
+							root.setDataType(TokenType.LITERAL_INT);
+						}
 					} else {
-						root.setData((int) (left2.getData() / right2.getData()));
-						root.setDataType(TokenType.LITERAL_INT);
+						if (left2.getDataType() == TokenType.LITERAL_DOUBLE
+								|| right2.getDataType() == TokenType.LITERAL_DOUBLE) {
+							root.setData(left2.getData() / right2.getData());
+							root.setDataType(TokenType.LITERAL_DOUBLE);
+						} else {
+							root.setData((int) (left2.getData() / right2.getData()));
+							root.setDataType(TokenType.LITERAL_INT);
+						}
 					}
+
 					root.setBoolean(!(root.getData() == 0));
 				} else
 					try {
