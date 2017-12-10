@@ -57,6 +57,8 @@ public class Interpreter {
 		case FOR_STMT:
 			interpreterFOR(root);
 			break;
+		case INTERRUPT:
+			interpreterINTERRUPT(root);
 		default:
 			break;
 
@@ -582,5 +584,16 @@ public class Interpreter {
 		}
 
 		return root;
+	}
+	
+	/**
+	 * 解析中断结点
+	 * 
+	 * @param root
+	 * @return
+	 * @throws InterpretException
+	 */
+	private static void interpreteINTERRUPT(TreeNode root) throws InterpretException {
+		//TODO
 	}
 }

@@ -1,7 +1,5 @@
 package ui;
 
-
-import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,7 +17,6 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -47,6 +44,7 @@ import exception.LexerException;
 import exception.ParserException;
 import model.Token;
 import model.TreeNode;
+import model.TreeNodeType;
 
 public class Main {
 
@@ -56,6 +54,7 @@ public class Main {
 	public static final  StyledText resultdata2  = new StyledText(shell, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.WRAP);
 	public static final  StyledText input  = new StyledText(shell, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.WRAP);
 	public static final  StyledText  inputTag = new StyledText(shell, SWT.MULTI | SWT.BORDER | SWT.WRAP);
+	public static LinkedList<TreeNode> tree;
 	public static void main(String[] args) {
 		final StyledText codedata = new StyledText(shell, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.WRAP);
 		final JavaLineStyler lineStyler = new JavaLineStyler();
@@ -93,6 +92,8 @@ public class Main {
 		parseItem.setText("语法分析");
 		MenuItem runItem = new MenuItem(runmenu, SWT.PUSH);
 		runItem.setText("解释执行");
+		MenuItem debugItem = new MenuItem(runmenu, SWT.PUSH);
+		debugItem.setText("调试执行");
 		MenuItem help = new MenuItem(menu, SWT.CASCADE);
 		help.setText("帮助");
 		Menu helpmenu = new Menu(shell, SWT.DROP_DOWN);
@@ -237,7 +238,7 @@ public class Main {
 							
 							try {
 								LinkedList<Token> l = SyntaxParser.getTokenList(filestr);
-								LinkedList<TreeNode> tree = SyntaxParser.syntaxAnalyse(l);
+								tree = SyntaxParser.syntaxAnalyse(l);
 								Interpreter.interpreter(tree);
 								
 							} catch (LexerException e) {
@@ -322,6 +323,50 @@ public class Main {
 		};
 		parseItem.addSelectionListener(parserListener);
 		
+		final SelectionListener debugListener = new SelectionListener() {
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent arg0) { }
+
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				try {
+					Display display =  resultdata2.getDisplay();
+					display.asyncExec(new Runnable() {
+						public void run() {
+							resultdata2.setText("Result:"+"\n");
+							
+							try {
+								if(tree == null) {
+									LinkedList<Token> l = SyntaxParser.getTokenList(filestr);
+									tree = SyntaxParser.syntaxAnalyse(l);
+								}
+								Interpreter.interpreter(tree);
+								
+							} catch (LexerException e) {
+								e.printStackTrace();
+							} catch (IOException e) {
+								e.printStackTrace();
+							} catch (ParserException e) {
+								e.printStackTrace();
+							} catch (InterpretException e) {
+								e.printStackTrace();
+							} 
+							resultdata2.append(Interpreter.result.toString());
+							System.out.println(Interpreter.result.toString());
+							Interpreter.result.setLength(0);
+						}
+					});
+		
+					
+				} catch (Exception e1) {
+				}
+				
+			}
+			
+		};
+		debugItem.addSelectionListener(debugListener);
+		
 		aboutItem.addSelectionListener(new SelectionListener() {
 
 			
@@ -366,6 +411,10 @@ public class Main {
 		runToolItem.setImage(new Image(display, "res" + File.separator + "ic_run.png"));
 		runToolItem.setToolTipText("Run");
 		
+		ToolItem debugToolItem = new ToolItem(toolbar, SWT.PUSH);
+		debugToolItem.setImage(new Image(display, "res" + File.separator + "ic_debug.png"));
+		debugToolItem.setToolTipText("Debug");
+		
 		ToolItem quitToolItem = new ToolItem(toolbar, SWT.PUSH);
 		quitToolItem.setImage(new Image(display, "res" + File.separator + "ic_quit.png"));
 		quitToolItem.setToolTipText("Exit");
@@ -375,6 +424,7 @@ public class Main {
 		lexerToolItem.addSelectionListener(lexerListener);
 		parserToolItem.addSelectionListener(parserListener);
 		runToolItem.addSelectionListener(runListener);
+		debugToolItem.addSelectionListener(debugListener);
 		quitToolItem.addSelectionListener(exitListener);
 		
 		// 工具栏结束
@@ -407,16 +457,49 @@ public class Main {
 		codedata.addMouseListener(new MouseListener() {
 
 			@Override
-			public void mouseDoubleClick(MouseEvent e) {
-				// TODO Auto-generated method stub
+			public void mouseDoubleClick(MouseEvent me) {
 				int line = codedata.getLineAtOffset(codedata.getCaretOffset());
+				try {
+					LinkedList<Token> l = SyntaxParser.getTokenList(filestr);
+					tree = SyntaxParser.syntaxAnalyse(l);
+				} catch (LexerException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (ParserException e) {
+					e.printStackTrace();
+				}
 				if(codedata.getLineBackground(line) != null) {
 					codedata.setLineBackground(line, 1, null);
-					//TODO 删除中断节点
+					//删除中断节点
+					for(TreeNode n : tree) {
+						if(n.getLeft() != null && n.getLeft().getType() == TreeNodeType.INTERRUPT
+								&& n.getLeft().getLineNo() == line) {
+							n.setMiddle(n.getLeft().getMiddle());
+							n.setRight(n.getLeft().getRight());
+							n.setLeft(n.getLeft().getLeft());
+							break;
+						}
+					}
 				}
 				else {
 					codedata.setLineBackground(line, 1, shell.getDisplay().getSystemColor(SWT.COLOR_CYAN));
-					//TODO 添加中断节点
+					//添加中断节点
+					//遍历树，找到在line行的节点，在其上方插入中断节点
+					for(TreeNode n : tree) {
+						if((n.getLeft() != null && n.getLeft().getLineNo() == line)
+						|| (n.getMiddle() != null && n.getMiddle().getLineNo() == line
+						|| (n.getRight() != null && n.getRight().getLineNo() == line))) {
+							TreeNode interrupt = new TreeNode(TreeNodeType.INTERRUPT, "interrupt", line);
+							interrupt.setLeft(n.getLeft());
+							interrupt.setMiddle(n.getMiddle());
+							interrupt.setRight(n.getRight());
+							n.setLeft(interrupt);
+							n.setMiddle(null);
+							n.setRight(null);
+							break;
+						}
+					}
 				}
 			}
 
