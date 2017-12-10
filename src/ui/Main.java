@@ -55,7 +55,10 @@ public class Main {
 	final static Shell shell = new Shell(display);
 	public static final  StyledText resultdata2  = new StyledText(shell, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.WRAP);
 	public static final  StyledText input  = new StyledText(shell, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.WRAP);
+	public static final  StyledText variable  = new StyledText(shell, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.WRAP);
 	public static final  StyledText  inputTag = new StyledText(shell, SWT.MULTI | SWT.BORDER | SWT.WRAP);
+	public static final  StyledText  resultdata2Tag = new StyledText(shell, SWT.MULTI | SWT.BORDER | SWT.WRAP);
+	public static final  StyledText  variableTag = new StyledText(shell, SWT.MULTI | SWT.BORDER | SWT.WRAP);
 	public static List<TreeNode> tree;
 	public static void main(String[] args) {		
 		final StyledText codedata = new StyledText(shell, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.WRAP);
@@ -347,7 +350,6 @@ public class Main {
 
 							@Override
 							public void run() {
-								// TODO Auto-generated method stub
 								resultdata2.setText("Result:"+"\n");
 								
 								try {
@@ -373,6 +375,7 @@ public class Main {
 								resultdata2.append(Interpreter.result.toString());
 								System.out.println(Interpreter.result.toString());
 								Interpreter.result.setLength(0);
+								variable.setText(Interpreter.getVariables());
 							}
 							
 						});
@@ -396,6 +399,7 @@ public class Main {
 					resultdata2.append(Interpreter.result.toString());
 					System.out.println(Interpreter.result.toString());
 					Interpreter.result.setLength(0);
+					variable.setText(Interpreter.getVariables());
 				} catch (InterpretException e) {
 					e.printStackTrace();
 				}
@@ -567,22 +571,11 @@ public class Main {
 			
 		});
 		
-		
 		fd = new FormData();
 		fd.top = new FormAttachment(50, 24);
 		fd.left = new FormAttachment(0, 1);
 		fd.bottom = new FormAttachment(100, -1);
-		fd.right = new FormAttachment(80, -1);
-		resultdata2.setLayoutData(fd);
-		resultdata2.setEditable(true);
-		resultdata2.setAlwaysShowScrollBars(false);
-		resultdata2.setBackgroundImage(new Image(display,"res//background.png"));
-		
-		fd = new FormData();
-		fd.top = new FormAttachment(50, 24);
-		fd.left = new FormAttachment(80, 1);
-		fd.bottom = new FormAttachment(100, -1);
-		fd.right = new FormAttachment(100, -1);
+		fd.right = new FormAttachment(30, -1);
 		inputTag.setLayoutData(fd);
 		inputTag.setEditable(false);
 		inputTag.setAlwaysShowScrollBars(false);
@@ -596,14 +589,57 @@ public class Main {
 		
 		fd = new FormData();
 		fd.top = new FormAttachment(53, 24);
-		fd.left = new FormAttachment(80, 1);
+		fd.left = new FormAttachment(0, 1);
 		fd.bottom = new FormAttachment(100, -1);
-		fd.right = new FormAttachment(100, -1);
+		fd.right = new FormAttachment(30, -1);
 		input.setLayoutData(fd);
 		input.setEditable(true);
 		input.setAlwaysShowScrollBars(false);
 		
+		fd = new FormData();
+		fd.top = new FormAttachment(50, 24);
+		fd.left = new FormAttachment(30, 1);
+		fd.bottom = new FormAttachment(100, -1);
+		fd.right = new FormAttachment(70, -1);
+		resultdata2Tag.setLayoutData(fd);
+		resultdata2Tag.setEditable(false);
+		resultdata2Tag.setAlwaysShowScrollBars(false);
+		resultdata2Tag.setText("Output box");
+		resultdata2Tag.setFont(font);
+		ranges[0] = new StyleRange(0, 10, green, null);
+		resultdata2Tag.replaceStyleRanges(0, 10, ranges);
 		
+		fd = new FormData();
+		fd.top = new FormAttachment(53, 24);
+		fd.left = new FormAttachment(30, 1);
+		fd.bottom = new FormAttachment(100, -1);
+		fd.right = new FormAttachment(70, -1);
+		resultdata2.setLayoutData(fd);
+		resultdata2.setEditable(true);
+		resultdata2.setAlwaysShowScrollBars(false);
+		resultdata2.setBackgroundImage(new Image(display,"res//background.png"));
+		
+		fd = new FormData();
+		fd.top = new FormAttachment(50, 24);
+		fd.left = new FormAttachment(70, 1);
+		fd.bottom = new FormAttachment(100, -1);
+		fd.right = new FormAttachment(100, -1);
+		variableTag.setLayoutData(fd);
+		variableTag.setEditable(false);
+		variableTag.setAlwaysShowScrollBars(false);
+		variableTag.setText("Variable");
+		variableTag.setFont(font);
+		ranges[0] = new StyleRange(0, 8, green, null);
+		variableTag.replaceStyleRanges(0, 8, ranges);
+		
+		fd = new FormData();
+		fd.top = new FormAttachment(53, 24);
+		fd.left = new FormAttachment(70, 1);
+		fd.bottom = new FormAttachment(100, -1);
+		fd.right = new FormAttachment(100, -1);
+		variable.setLayoutData(fd);
+		variable.setEditable(true);
+		variable.setAlwaysShowScrollBars(false);
 		
 		// 主要布局结束
 		

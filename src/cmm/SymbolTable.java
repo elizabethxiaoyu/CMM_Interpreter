@@ -17,6 +17,14 @@ public class SymbolTable {
 
 	private ArrayList<Symbol> symbolList = new ArrayList<Symbol>();
 
+	public ArrayList<Symbol> getSymbolList() {
+		return symbolList;
+	}
+
+	public void setSymbolList(ArrayList<Symbol> symbolList) {
+		this.symbolList = symbolList;
+	}
+
 	private SymbolTable() {
 	}
 

@@ -616,4 +616,12 @@ public class Interpreter {
 		if(root.getLeft() != null)
 			interpreterStmt(root.getLeft());
 	}
+	
+	public static String getVariables() {
+		StringBuilder variables = new StringBuilder();
+		for(Symbol s : symbolTable.getSymbolList()) {
+			variables.append(s.getName() + ": " + s.getValue() + "\n");
+		}
+		return variables.toString();
+	}
 }
