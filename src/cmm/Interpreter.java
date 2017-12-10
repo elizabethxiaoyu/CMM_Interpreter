@@ -2,6 +2,7 @@ package cmm;
 
 import java.util.InputMismatchException;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -20,16 +21,28 @@ public class Interpreter {
 	static java.util.regex.Pattern pattern2 = Pattern.compile("[-]?[0-9]*(\\.?)[0]"); // 整数的小数形式
 	public static StringBuilder result = new StringBuilder();
 
-	public static void interpreter(LinkedList<TreeNode> trees) throws InterpretException {
+	public static List<TreeNode> interpreter(List<TreeNode> trees) throws InterpretException {
 		symbolTable.deleteTable();
 		symbolTable.newTable();
+		return interpreterSubTrees(trees);
+	}
+	
+	public static List<TreeNode> interpreterSubTrees(List<TreeNode> trees) throws InterpretException {
 		for (TreeNode root : trees) {
-			if (root != null)
-				interpreterStmt(root);
+			if (root != null) {
+				TreeNode current = interpreterStmt(root);
+				if(current != null) {
+					return trees.subList(trees.indexOf(current), trees.size());
+				}
+			}
 		}
+		return null;
 	}
 
-	private static void interpreterStmt(TreeNode root) throws InterpretException {
+	private static TreeNode interpreterStmt(TreeNode root) throws InterpretException {
+		if(root.getInterrupt()) {
+			return root;
+		}
 		switch (root.getType()) {
 		case IF_STMT:
 			interpreterIF(root);
@@ -57,13 +70,11 @@ public class Interpreter {
 		case FOR_STMT:
 			interpreterFOR(root);
 			break;
-		case INTERRUPT:
-			interpreterINTERRUPT(root);
 		default:
 			break;
 
 		}
-
+		return null;
 	}
 
 	/**
@@ -593,7 +604,16 @@ public class Interpreter {
 	 * @return
 	 * @throws InterpretException
 	 */
-	private static void interpreteINTERRUPT(TreeNode root) throws InterpretException {
-		//TODO
+	private static void interpreterINTERRUPT(TreeNode root) throws InterpretException {
+		try {
+			synchronized(Thread.currentThread()) {
+				Thread.currentThread().wait();
+			}
+			//ui.Main.r.wait();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		if(root.getLeft() != null)
+			interpreterStmt(root.getLeft());
 	}
 }

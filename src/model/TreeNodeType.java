@@ -118,7 +118,6 @@ public enum TreeNodeType {
 	 FOR_JUDGE_LIST,
 	 LITERAL_STRING, //字符串字面常量
 	STRING,                 //字符串关键字
-	INTERRUPT	//中断节点
 
 
 }

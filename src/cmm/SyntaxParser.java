@@ -101,7 +101,7 @@ public class SyntaxParser {
 		return  treeNode;
 	}
 	/**
-	 * TODO 完成for循环
+	 * for循环
 	 * @return
 	 */
 	private static TreeNode parseForStmt() throws ParserException{

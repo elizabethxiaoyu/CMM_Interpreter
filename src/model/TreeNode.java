@@ -16,6 +16,8 @@ public class TreeNode {
 	private String mString;
 	 // 如果是代码块中的代码,则mNext指向其后面的一条语句 普通的顶级代码都是存在linkedlist中,不需要使用这个参数
 	private TreeNode mNext;
+	// 是否是中断节点
+	private boolean isInterrupt = false;
 	
 	public TreeNode(){}
 	public TreeNode(TreeNodeType type) {
@@ -135,6 +137,12 @@ public class TreeNode {
 			return this.type + "    "+ this.value;
 		
 		
+	}
+	public boolean getInterrupt() {
+		return isInterrupt;
+	}
+	public void setInterrupt(boolean isInterrupt) {
+		this.isInterrupt = isInterrupt;
 	}
 
 }

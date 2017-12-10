@@ -8,7 +8,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.JFrame;
 
@@ -54,8 +56,8 @@ public class Main {
 	public static final  StyledText resultdata2  = new StyledText(shell, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.WRAP);
 	public static final  StyledText input  = new StyledText(shell, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.WRAP);
 	public static final  StyledText  inputTag = new StyledText(shell, SWT.MULTI | SWT.BORDER | SWT.WRAP);
-	public static LinkedList<TreeNode> tree;
-	public static void main(String[] args) {
+	public static List<TreeNode> tree;
+	public static void main(String[] args) {		
 		final StyledText codedata = new StyledText(shell, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.WRAP);
 		final JavaLineStyler lineStyler = new JavaLineStyler();
 		shell.setSize(1366, 768);
@@ -92,8 +94,16 @@ public class Main {
 		parseItem.setText("语法分析");
 		MenuItem runItem = new MenuItem(runmenu, SWT.PUSH);
 		runItem.setText("解释执行");
-		MenuItem debugItem = new MenuItem(runmenu, SWT.PUSH);
+		
+		MenuItem debug = new MenuItem(menu, SWT.CASCADE);
+		debug.setText("调试");
+		Menu debugmenu = new Menu(shell, SWT.DROP_DOWN);
+		debug.setMenu(debugmenu);
+		MenuItem debugItem = new MenuItem(debugmenu, SWT.PUSH);
 		debugItem.setText("调试执行");
+		MenuItem resumeItem = new MenuItem(debugmenu, SWT.PUSH);
+		resumeItem.setText("继续调试");
+		
 		MenuItem help = new MenuItem(menu, SWT.CASCADE);
 		help.setText("帮助");
 		Menu helpmenu = new Menu(shell, SWT.DROP_DOWN);
@@ -330,42 +340,69 @@ public class Main {
 
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-				try {
-					Display display =  resultdata2.getDisplay();
-					display.asyncExec(new Runnable() {
-						public void run() {
-							resultdata2.setText("Result:"+"\n");
-							
-							try {
-								if(tree == null) {
-									LinkedList<Token> l = SyntaxParser.getTokenList(filestr);
-									tree = SyntaxParser.syntaxAnalyse(l);
-								}
-								Interpreter.interpreter(tree);
+				new Thread() {
+					public void run() {
+						Display display =  resultdata2.getDisplay();
+						display.asyncExec(new Runnable() {
+
+							@Override
+							public void run() {
+								// TODO Auto-generated method stub
+								resultdata2.setText("Result:"+"\n");
 								
-							} catch (LexerException e) {
-								e.printStackTrace();
-							} catch (IOException e) {
-								e.printStackTrace();
-							} catch (ParserException e) {
-								e.printStackTrace();
-							} catch (InterpretException e) {
-								e.printStackTrace();
-							} 
-							resultdata2.append(Interpreter.result.toString());
-							System.out.println(Interpreter.result.toString());
-							Interpreter.result.setLength(0);
-						}
-					});
-		
-					
-				} catch (Exception e1) {
-				}
-				
+								try {
+									if(tree == null) {
+										LinkedList<Token> l = SyntaxParser.getTokenList(filestr);
+										tree = SyntaxParser.syntaxAnalyse(l);
+										tree = Interpreter.interpreter(tree);
+									}
+									else {
+										tree = Interpreter.interpreterSubTrees(tree);
+									}
+									if(tree != null)
+										tree.get(0).setInterrupt(false);
+								} catch (LexerException e) {
+									e.printStackTrace();
+								} catch (IOException e) {
+									e.printStackTrace();
+								} catch (ParserException e) {
+									e.printStackTrace();
+								} catch (InterpretException e) {
+									e.printStackTrace();
+								} 
+								resultdata2.append(Interpreter.result.toString());
+								System.out.println(Interpreter.result.toString());
+								Interpreter.result.setLength(0);
+							}
+							
+						});
+					}
+				}.start();
 			}
 			
 		};
 		debugItem.addSelectionListener(debugListener);
+		
+		final SelectionListener resumeListener = new SelectionListener() {
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent arg0) { }
+
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				if(tree == null) return;
+				try {
+					tree = Interpreter.interpreterSubTrees(tree);
+					resultdata2.append(Interpreter.result.toString());
+					System.out.println(Interpreter.result.toString());
+					Interpreter.result.setLength(0);
+				} catch (InterpretException e) {
+					e.printStackTrace();
+				}
+			}
+			
+		};
+		resumeItem.addSelectionListener(resumeListener);
 		
 		aboutItem.addSelectionListener(new SelectionListener() {
 
@@ -415,6 +452,10 @@ public class Main {
 		debugToolItem.setImage(new Image(display, "res" + File.separator + "ic_debug.png"));
 		debugToolItem.setToolTipText("Debug");
 		
+		ToolItem resumeToolItem = new ToolItem(toolbar, SWT.PUSH);
+		resumeToolItem.setImage(new Image(display, "res" + File.separator + "ic_resume.png"));
+		resumeToolItem.setToolTipText("Resume");
+		
 		ToolItem quitToolItem = new ToolItem(toolbar, SWT.PUSH);
 		quitToolItem.setImage(new Image(display, "res" + File.separator + "ic_quit.png"));
 		quitToolItem.setToolTipText("Exit");
@@ -425,6 +466,7 @@ public class Main {
 		parserToolItem.addSelectionListener(parserListener);
 		runToolItem.addSelectionListener(runListener);
 		debugToolItem.addSelectionListener(debugListener);
+		resumeToolItem.addSelectionListener(resumeListener);
 		quitToolItem.addSelectionListener(exitListener);
 		
 		// 工具栏结束
@@ -460,8 +502,10 @@ public class Main {
 			public void mouseDoubleClick(MouseEvent me) {
 				int line = codedata.getLineAtOffset(codedata.getCaretOffset());
 				try {
-					LinkedList<Token> l = SyntaxParser.getTokenList(filestr);
-					tree = SyntaxParser.syntaxAnalyse(l);
+					if(tree == null) {
+						LinkedList<Token> l = SyntaxParser.getTokenList(filestr);
+						tree = SyntaxParser.syntaxAnalyse(l);
+					}
 				} catch (LexerException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
@@ -471,36 +515,48 @@ public class Main {
 				}
 				if(codedata.getLineBackground(line) != null) {
 					codedata.setLineBackground(line, 1, null);
-					//删除中断节点
-					for(TreeNode n : tree) {
-						if(n.getLeft() != null && n.getLeft().getType() == TreeNodeType.INTERRUPT
-								&& n.getLeft().getLineNo() == line) {
-							n.setMiddle(n.getLeft().getMiddle());
-							n.setRight(n.getLeft().getRight());
-							n.setLeft(n.getLeft().getLeft());
-							break;
-						}
+					//删除中断
+					Iterator<TreeNode> iterator = tree.iterator();
+					while (iterator.hasNext()) {
+						TreeNode subTree = iterator.next();
+						deleteInterrupt(subTree, line);
 					}
 				}
 				else {
 					codedata.setLineBackground(line, 1, shell.getDisplay().getSystemColor(SWT.COLOR_CYAN));
-					//添加中断节点
-					//遍历树，找到在line行的节点，在其上方插入中断节点
-					for(TreeNode n : tree) {
-						if((n.getLeft() != null && n.getLeft().getLineNo() == line)
-						|| (n.getMiddle() != null && n.getMiddle().getLineNo() == line
-						|| (n.getRight() != null && n.getRight().getLineNo() == line))) {
-							TreeNode interrupt = new TreeNode(TreeNodeType.INTERRUPT, "interrupt", line);
-							interrupt.setLeft(n.getLeft());
-							interrupt.setMiddle(n.getMiddle());
-							interrupt.setRight(n.getRight());
-							n.setLeft(interrupt);
-							n.setMiddle(null);
-							n.setRight(null);
-							break;
-						}
+					//添加中断
+					Iterator<TreeNode> iterator = tree.iterator();
+					while (iterator.hasNext()) {
+						TreeNode subTree = iterator.next();
+						insertInterrupt(subTree, line + 1);
 					}
 				}
+			}
+
+			private void insertInterrupt(TreeNode subTree, int line) {
+				if(subTree != null && subTree.getLineNo() == line) {
+					subTree.setInterrupt(true);
+					return;
+				}
+				if(subTree != null && subTree.getLeft() != null)
+					insertInterrupt(subTree.getLeft(), line);
+				if(subTree != null && subTree.getMiddle() != null)
+					insertInterrupt(subTree.getMiddle(), line);
+				if(subTree != null && subTree.getRight() != null)
+					insertInterrupt(subTree.getRight(), line);
+			}
+
+			private void deleteInterrupt(TreeNode subTree, int line) {
+				if(subTree != null && subTree.getInterrupt()
+						&& subTree.getLineNo() == line) {
+					subTree.setInterrupt(false);
+				}
+				if(subTree != null && subTree.getLeft() != null)
+					deleteInterrupt(subTree.getLeft(), line);
+				if(subTree != null && subTree.getMiddle() != null)
+					deleteInterrupt(subTree.getMiddle(), line);
+				if(subTree != null && subTree.getRight() != null)	
+					deleteInterrupt(subTree.getRight(), line);
 			}
 
 			@Override
