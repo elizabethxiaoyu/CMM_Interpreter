@@ -356,11 +356,8 @@ public class Main {
 									if(tree == null) {
 										LinkedList<Token> l = SyntaxParser.getTokenList(filestr);
 										tree = SyntaxParser.syntaxAnalyse(l);
-										tree = Interpreter.interpreter(tree);
 									}
-									else {
-										tree = Interpreter.interpreterSubTrees(tree);
-									}
+									tree = Interpreter.interpreter(tree);
 									if(tree != null)
 										tree.get(0).setInterrupt(false);
 								} catch (LexerException e) {
