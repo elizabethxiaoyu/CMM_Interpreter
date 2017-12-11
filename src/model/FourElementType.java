@@ -1,5 +1,8 @@
-package model;
+﻿package model;
 
+/**
+ * Created by xietian on 2017/12/1.
+ */
 public class FourElementType {
 
     public static final String JUMP = "JUMP";
