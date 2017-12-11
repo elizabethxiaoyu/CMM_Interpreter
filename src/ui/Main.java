@@ -396,6 +396,8 @@ public class Main {
 				if(tree == null) return;
 				try {
 					tree = Interpreter.interpreterSubTrees(tree);
+					if(tree != null)
+						tree.get(0).setInterrupt(false);
 					resultdata2.append(Interpreter.result.toString());
 					System.out.println(Interpreter.result.toString());
 					Interpreter.result.setLength(0);
