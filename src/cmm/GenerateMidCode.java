@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
+/**
+ * Created by xietian on 2017/12/1.
+ */
 public class GenerateMidCode {
     private static int mLevel;
     private static int mLine;
