@@ -1,3 +1,6 @@
+/**
+ * 语法分析器，获得词法分析器产生的token列表，采用自顶向下递归子程序法，构造语法树，返回语法树森林。
+ */
 package cmm;
 
 import java.io.BufferedReader;

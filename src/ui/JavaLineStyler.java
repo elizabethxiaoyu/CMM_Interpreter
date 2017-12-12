@@ -219,7 +219,7 @@ class JavaLineStyler implements LineStyleListener {
 		private String[] fgKeywords = { "abstract", "boolean", "break", "byte", "case", "catch", "char", "class",
 				"continue", "default", "do", "double", "else", "extends", "false", "final", "finally", "float", "for",
 				"if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "null",
-				"package", "private", "protected", "public", "return", "short", "static", "super", "switch",
+				"package", "private", "protected", "public", "return", "short", "static", "super", "switch","string",
 				"synchronized", "this", "throw", "throws", "transient", "true", "try", "void", "volatile", "while",
 				"write", "read", "real" };
 

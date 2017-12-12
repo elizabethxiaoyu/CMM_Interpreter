@@ -270,10 +270,10 @@ public class Interpreter {
 			if (pattern2.matcher(s).matches()
 					&& interpreterExpr(root.getMiddle()).getDataType() == TokenType.LITERAL_INT) {
 				System.out.print(((int) Double.parseDouble(s)));
-				result.append(String.valueOf(((int) Double.parseDouble(s))) + "\n");
+				result.append(String.valueOf(((int) Double.parseDouble(s))) );
 			} else {
 				System.out.print(s);
-				result.append(s + "\n");
+				result.append(s );
 			}
 		}
 	}
