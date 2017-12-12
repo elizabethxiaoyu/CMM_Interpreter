@@ -1,0 +1,6 @@
+﻿exception.SyntacticExeception: Unexpeted token "_a" at line 2
+	at Analysis.Parser.parseDeclareStmt(Parser.java:207)
+	at Analysis.Parser.parseStmt(Parser.java:97)
+	at Analysis.Parser.syntacticAnalyse(Parser.java:29)
+	at Analysis.Generator.generateCode(Generator.java:28)
+	at Analysis.Test.main(Test.java:22)
